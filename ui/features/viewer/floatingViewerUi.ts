@@ -2,6 +2,7 @@ import { EVENTS } from "../../app/events.js";
 import { APP_CONFIG } from "../../app/config.js";
 import { t } from "../../app/i18n.js";
 import { openMajoorSettings } from "../../app/openMajoorSettings.js";
+import { createOpenWorkflowButton } from "../workflows/openAssetWorkflow.js";
 import { appendTooltipHint, setTooltipHint } from "../../utils/tooltipShortcuts.js";
 import {
     CLOSE_HINT,
@@ -290,6 +291,7 @@ export function buildFloatingViewerToolbar(viewer: any): HTMLElement {
 
     const bar = document.createElement("div");
     bar.className = "mjr-mfv-toolbar";
+    bar.appendChild(createOpenWorkflowButton(() => viewer._mediaA || null));
 
     const modeDrop = _mkIconDrop(
         '<i class="pi pi-image" aria-hidden="true"></i>',

@@ -30,6 +30,28 @@ This is especially useful for video workflows, larger prompt-routing graphs, and
 
 ## How To Open It
 
+### Reopen the workflow that generated a media file
+
+Click **Open workflow** on an image or video card, in the floating viewer toolbar,
+or above the regular viewer's metadata panel. The same action is available in the
+media card's context menu. It opens a new ComfyUI workflow tab and does not queue a
+generation. The previous tab and its unsaved changes remain available.
+
+The action prefers the embedded editable workflow, retaining its layout, node
+connections, and saved widget values. If the file contains only a ComfyUI API
+execution graph, ComfyUI reconstructs a graph from those inputs; a message explains
+that the original layout was not embedded. No graph is invented from a plain prompt
+string. Files without either graph produce a clear message without changing the
+canvas.
+
+Indexed cards are hydrated on demand. Unindexed files use the existing metadata
+extractor, including its video-container support. Nothing is written to the media
+file. Loading still requires the relevant custom nodes, model files, and source
+media; ComfyUI's native loader handles its dependency warnings. Restoring a workflow
+does not guarantee an identical output across changed dependencies or hardware.
+
+### Inspect the workflow in Graph Map
+
 1. Open an asset in the Majoor Floating Viewer.
 2. Switch the viewer to **Graph Map** mode.
 3. If you also open the **Node Parameters** sidebar, use the **Graph Map** tab to keep the small preview and node details visible together.

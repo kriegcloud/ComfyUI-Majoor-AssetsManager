@@ -1,9 +1,9 @@
-import { H as e, P as t, Zt as n, _ as r, _t as i, c as a, d as o, g as s, ht as c, n as l, o as u, r as d, s as f, x as p, y as m } from "./viewerRuntimeHosts-DyiuTSfr.js";
-import { Ct as h, D as g, a as _, ct as v, h as y, i as b, j as x, k as S, m as C, n as w, o as T, pt as E, r as D, rt as O, t as k } from "./events-DrYpMD-I.js";
-import { T as A, nt as j, rt as M } from "./mjr-primevue-BlSRoWcG.js";
-import { n as N, r as ee } from "./mjr-vue-vendor-Bb2CVJXl.js";
+import { H as e, P as t, Zt as n, _ as r, _t as i, c as a, d as o, g as s, ht as c, n as l, o as u, r as d, s as f, x as p, y as m } from "./viewerRuntimeHosts-hxZR_B5C.js";
+import { D as h, a as g, h as _, i as v, it as y, j as b, k as x, lt as S, m as C, mt as w, n as T, o as E, r as D, t as O, wt as k } from "./events-DXdLblY2.js";
+import { T as A, nt as j, rt as M } from "./mjr-primevue-BOf2ACk_.js";
+import { n as N, r as ee } from "./mjr-vue-vendor-BKZZuiuB.js";
 import { n as P, r as te, t as F } from "./state-DPiaUMw1.js";
-import { a as ne, c as re, i as ie, o as ae, r as oe, s as se } from "./model3dRenderer-CWRtZrSS.js";
+import { a as ne, c as re, i as ie, o as ae, r as oe, s as se } from "./model3dRenderer-JLnYDjnt.js";
 //#region ui/utils/events.ts
 function ce(e, t, { target: n = null, warnPrefix: r = "[Majoor]" } = {}) {
 	let i = n || (typeof window < "u" ? window : null);
@@ -344,14 +344,14 @@ var le = async (e, t = "Majoor", n = {}) => {
 	});
 }, ue = () => {
 	try {
-		return x()?.ui || null;
+		return b()?.ui || null;
 	} catch {
 		return null;
 	}
 }, de = () => {
 	let e = (e) => !!e && (typeof e.alert == "function" || typeof e.confirm == "function" || typeof e.prompt == "function");
 	try {
-		let t = g();
+		let t = h();
 		if (e(t)) return t;
 	} catch (e) {
 		console.debug?.(e);
@@ -359,7 +359,7 @@ var le = async (e, t = "Majoor", n = {}) => {
 	return null;
 }, R = () => {
 	try {
-		let e = S();
+		let e = x();
 		if (e && typeof e.add == "function") return e;
 	} catch (e) {
 		console.debug?.(e);
@@ -404,7 +404,7 @@ var le = async (e, t = "Majoor", n = {}) => {
 	let r = document.createElement(e);
 	return Object.entries(t || {}).forEach(([e, t]) => {
 		let n = String(e || "");
-		if (!(!n || V.has(n))) {
+		if (n && !V.has(n)) {
 			if (e === "style" && t && typeof t == "object") {
 				Object.assign(r.style, t);
 				return;
@@ -739,7 +739,7 @@ function ze(e, t = [], { assetKey: n = null, preserveHiddenCount: r = !1 } = {})
 	let i = Number(e?.hiddenPngSiblings || 0) || 0;
 	e.seenKeys = /* @__PURE__ */ new Set(), e.assetIdSet = /* @__PURE__ */ new Set(), e.filenameCounts = /* @__PURE__ */ new Map(), e.nonImageSiblingKeys = /* @__PURE__ */ new Set(), e.stemMap = /* @__PURE__ */ new Map(), e.renderedFilenameMap = /* @__PURE__ */ new Map(), e.hiddenPngSiblings = r ? i : 0, typeof n == "function" && (e.assetKeyFn = n);
 	let a = Re(e);
-	for (let r of Array.isArray(t) ? t : []) if (!(!r || typeof r != "object")) {
+	for (let r of Array.isArray(t) ? t : []) if (r && typeof r == "object") {
 		try {
 			let e = r?.id == null ? "" : String(r.id);
 			e && a.assetIdSet.add(e);
@@ -1329,7 +1329,7 @@ async function pt(e) {
 //#endregion
 //#region ui/utils/deleteGuard.ts
 async function mt(e, t) {
-	return !T.DELETE_CONFIRMATION || !!await I(e > 1 ? C("dialog.deleteSelectedFiles", "Delete {count} selected files?", { count: e }) : C("dialog.deleteSingleFile", "Delete \"{label}\"?", { label: String(t || C("label.thisFile", "this file")) }), C("dialog.confirmDeleteTitle", "Majoor: Confirm delete"));
+	return !E.DELETE_CONFIRMATION || !!await I(e > 1 ? C("dialog.deleteSelectedFiles", "Delete {count} selected files?", { count: e }) : C("dialog.deleteSingleFile", "Delete \"{label}\"?", { label: String(t || C("label.thisFile", "this file")) }), C("dialog.confirmDeleteTitle", "Majoor: Confirm delete"));
 }
 //#endregion
 //#region ui/features/collections/contextmenu/addToCollectionMenuState.ts
@@ -1362,7 +1362,7 @@ function yt(e) {
 		filename: e.filename || "",
 		subfolder: e.subfolder || "",
 		type: (e.type || "output").toLowerCase(),
-		root_id: h(e),
+		root_id: k(e),
 		kind: e.kind || ""
 	} : null;
 }
@@ -1450,7 +1450,7 @@ function Ot(e, t, n, { setAriaLabel: r = !0, ariaLabel: i = null } = {}) {
 var kt = () => {};
 function At(e) {
 	try {
-		return !!T?.[e];
+		return !!E?.[e];
 	} catch {
 		return !1;
 	}
@@ -2179,7 +2179,7 @@ function Qt(e, t = {}) {
 				console.debug?.(e);
 			}
 		}, Le = () => {
-			if (!(!a || !r)) try {
+			if (a && r) try {
 				let t = Number(e?.duration);
 				if (!Number.isFinite(t) || t <= 0) {
 					y.style.backgroundImage = "", b.replaceChildren();
@@ -2716,7 +2716,7 @@ function Qt(e, t = {}) {
 			} catch (e) {
 				console.debug?.(e);
 			}
-			if (!(!(q._ppReverse || !e?.paused) || ve.signal?.aborted)) {
+			if (!(!q._ppReverse && e?.paused || ve.signal?.aborted)) {
 				try {
 					if (typeof e?.requestVideoFrameCallback == "function" && !q._ppReverse) {
 						et.rvfcId = e.requestVideoFrameCallback(nt);
@@ -2734,7 +2734,7 @@ function Qt(e, t = {}) {
 				}
 			}
 		}, rt = () => {
-			tt(), !(!(q._ppReverse || !e?.paused) || ve.signal?.aborted) && nt(0, { mediaTime: Number(e?.currentTime) || 0 });
+			tt(), !(!q._ppReverse && e?.paused || ve.signal?.aborted) && nt(0, { mediaTime: Number(e?.currentTime) || 0 });
 		};
 		K.push(tt), K.push(Z(e, "play", () => {
 			X(Fe), rt();
@@ -3150,7 +3150,7 @@ function Sn(e, n, r) {
 			errorMessage: "Failed to update rating",
 			warnPrefix: "[ViewerContextMenu]",
 			onSuccess: () => {
-				ce(k, {
+				ce(O, {
 					assetId: String(i),
 					rating: n
 				}, { warnPrefix: "[ViewerContextMenu]" });
@@ -3187,7 +3187,7 @@ function wn(e, t, n) {
 	}, { disabled: !n })), r;
 }
 function Tn({ asset: t, event: r, getCurrentViewUrl: a, onAssetChanged: s }) {
-	let l = typeof a == "function" ? a(t) : O(t), u = !!(t?.id || t?.filepath);
+	let l = typeof a == "function" ? a(t) : y(t), u = !!(t?.id || t?.filepath);
 	return [
 		yn(C("ctx.openInNewTab", "Open in New Tab"), "pi pi-external-link", null, async () => {
 			xn(l) && window.open(l, "_blank", "noopener,noreferrer");
@@ -3206,7 +3206,7 @@ function Tn({ asset: t, event: r, getCurrentViewUrl: a, onAssetChanged: s }) {
 		}),
 		yn(C("ctx.downloadOriginal", "Download Original"), "pi pi-download", mn.DOWNLOAD, async () => {
 			if (!t || !t.filepath) return;
-			let e = v(t.filepath), r = document.createElement("a");
+			let e = S(t.filepath), r = document.createElement("a");
 			r.href = e, r.download = t.filename, document.body.appendChild(r), r.click(), document.body.removeChild(r), n(C("toast.downloadingFile", "Downloading {filename}...", { filename: t.filename }), "info", 3e3);
 		}, { disabled: !t?.filepath }),
 		yn(C("ctx.openInFolder", "Open in folder"), "pi pi-folder-open", mn.OPEN_IN_FOLDER, async () => {
@@ -3232,7 +3232,7 @@ function Tn({ asset: t, event: r, getCurrentViewUrl: a, onAssetChanged: s }) {
 				asset: t,
 				onChanged: ((...e) => {
 					let n = e[0];
-					t.tags = n, ce(w, {
+					t.tags = n, ce(T, {
 						assetId: String(t.id),
 						tags: n
 					}, { warnPrefix: "[ViewerContextMenu]" });
@@ -3259,7 +3259,7 @@ function Tn({ asset: t, event: r, getCurrentViewUrl: a, onAssetChanged: s }) {
 				}
 				let r = e.data;
 				try {
-					ce(_, {
+					ce(g, {
 						assetId: String(t.id),
 						info: r
 					}, { warnPrefix: "[ViewerContextMenu]" });
@@ -3403,7 +3403,7 @@ function jn(e, t = {}) {
 var Mn = "mjr_viewer_prefs_v1";
 function Nn() {
 	try {
-		let e = y.get(Mn);
+		let e = _.get(Mn);
 		if (!e) return {};
 		let t = JSON.parse(e);
 		return t && typeof t == "object" ? t : {};
@@ -3423,7 +3423,7 @@ function Pn(e) {
 			audioVisualizerMode: String(e.audioVisualizerMode || "artistic"),
 			abWipePercent: Number.isFinite(Number(e._abWipePercent)) ? Number(e._abWipePercent) : 50
 		};
-		y.set(Mn, JSON.stringify(t));
+		_.set(Mn, JSON.stringify(t));
 	} catch (e) {
 		console.debug?.(e);
 	}
@@ -4853,7 +4853,7 @@ function Wn(e) {
 	}
 	return null;
 }
-function Gn({ overlay: e, _content: t, singleView: r, state: i, VIEWER_MODES: a, computeOneToOneZoom: o, setZoom: s, scheduleOverlayRedraw: c, scheduleApplyGrade: l, syncToolsUIFromState: u, applyDistractionFreeUI: d, navigateViewerAssets: p, closeViewer: m, renderBadges: h, updateAssetRating: g, safeDispatchCustomEvent: _, ASSET_RATING_CHANGED_EVENT: v, probeTooltip: y, loupeWrap: b, getVideoControls: x, lifecycle: S, renderGenInfoPanel: T } = {}) {
+function Gn({ overlay: e, _content: t, singleView: r, state: i, VIEWER_MODES: a, computeOneToOneZoom: o, setZoom: s, scheduleOverlayRedraw: c, scheduleApplyGrade: l, syncToolsUIFromState: u, applyDistractionFreeUI: d, navigateViewerAssets: p, closeViewer: m, renderBadges: h, updateAssetRating: g, safeDispatchCustomEvent: _, ASSET_RATING_CHANGED_EVENT: v, probeTooltip: y, loupeWrap: b, getVideoControls: x, lifecycle: S, renderGenInfoPanel: w } = {}) {
 	let E = S?.unsubs || [], D = null, O = null, k = () => {
 		try {
 			D && clearTimeout(D);
@@ -5035,7 +5035,7 @@ function Gn({ overlay: e, _content: t, singleView: r, state: i, VIEWER_MODES: a,
 				} catch (e) {
 					console.debug?.(e);
 				}
-				X(u), X(T);
+				X(u), X(w);
 				break;
 			case "t":
 			case "T":
@@ -5046,7 +5046,7 @@ function Gn({ overlay: e, _content: t, singleView: r, state: i, VIEWER_MODES: a,
 					asset: S,
 					onChanged: ((...e) => {
 						let t = e[0];
-						S.tags = t, _(w, {
+						S.tags = t, _(T, {
 							assetId: String(S.id),
 							tags: t
 						}, { warnPrefix: "[ViewerKeyboard]" }), X(h);
@@ -5124,7 +5124,7 @@ function Gn({ overlay: e, _content: t, singleView: r, state: i, VIEWER_MODES: a,
 				} catch (e) {
 					console.debug?.(e);
 				}
-				X(u), X(d), X(T);
+				X(u), X(d), X(w);
 				break;
 			case "c":
 			case "C": {
@@ -5258,7 +5258,7 @@ function Gn({ overlay: e, _content: t, singleView: r, state: i, VIEWER_MODES: a,
 //#region ui/features/viewer/videoSync.ts
 var Kn = () => {
 	try {
-		return !!T?.DEBUG_VIEWER;
+		return !!E?.DEBUG_VIEWER;
 	} catch {
 		return !1;
 	}
@@ -5309,7 +5309,7 @@ function qn(e, t, { threshold: n = .15, correctionCooldownMs: r = 250 } = {}) {
 		}, m = (e, { force: t = !1 } = {}) => {
 			if (!s) try {
 				let i = Number(e?.currentTime) || 0, a = e?.paused === !1, c = p(), l = Math.max(0, Number(r) || 0), d = t || !a || !u || c - u >= l, f = !1;
-				for (let t of o) if (!(!t || t === e)) try {
+				for (let t of o) if (t && t !== e) try {
 					Math.abs((Number(t.currentTime) || 0) - i) > n && d && (s = !0, t.currentTime = i, s = !1, f = !0);
 				} catch {
 					s = !1;
@@ -5346,7 +5346,7 @@ function qn(e, t, { threshold: n = .15, correctionCooldownMs: r = 250 } = {}) {
 		}
 		let _ = (t = {}) => m(e, t), v = (t, n = e) => {
 			if (!s) {
-				for (let e of o) if (!(!e || e === n)) try {
+				for (let e of o) if (e && e !== n) try {
 					if (t) f(e);
 					else {
 						try {
@@ -5362,7 +5362,7 @@ function qn(e, t, { threshold: n = .15, correctionCooldownMs: r = 250 } = {}) {
 			}
 		}, y = (t = e) => {
 			if (!s) {
-				for (let e of o) if (!(!e || e === t)) try {
+				for (let e of o) if (e && e !== t) try {
 					e.muted = !!t.muted, e.volume = Number(t.volume) || 0;
 				} catch (e) {
 					console.debug?.(e);
@@ -5370,7 +5370,7 @@ function qn(e, t, { threshold: n = .15, correctionCooldownMs: r = 250 } = {}) {
 			}
 		}, b = (t = e) => {
 			if (!s) {
-				for (let e of o) if (!(!e || e === t)) try {
+				for (let e of o) if (e && e !== t) try {
 					e.playbackRate = Number(t.playbackRate) || 1;
 				} catch (e) {
 					console.debug?.(e);
@@ -6176,7 +6176,7 @@ function Zn({ state: e, VIEWER_MODES: t, APP_CONFIG: n, getAssetMetadata: r, get
 			console.debug?.(e);
 		}
 	}, d = (e, t) => {
-		if (!(!e || !t || typeof t != "object")) {
+		if (e && t && typeof t == "object") {
 			try {
 				t.rating !== void 0 && (e.rating = t.rating);
 			} catch (e) {
@@ -6234,7 +6234,10 @@ function Zn({ state: e, VIEWER_MODES: t, APP_CONFIG: n, getAssetMetadata: r, get
 			l = new AbortController();
 			let a = l.signal;
 			try {
-				if (i === t?.SINGLE) return n && await f([n], { signal: a }), void 0;
+				if (i === t?.SINGLE) {
+					n && await f([n], { signal: a });
+					return;
+				}
 				let o = (Array.isArray(e?.assets) ? e.assets.slice(0, 4) : []).slice();
 				r && o.push(r), await f(o, { signal: a });
 			} catch (e) {
@@ -6460,7 +6463,7 @@ function $n({ overlay: e, content: t, singleView: n, abView: r, sideView: i, sta
 			let n = Number(a?.zoom) || 1, r = f(), { w: i, h: o } = p(r) || {
 				w: 0,
 				h: 0
-			}, s = m(), c = s && i > 0 && o > 0 ? E(i, o, s.width, s.height, n) : !1;
+			}, s = m(), c = s && i > 0 && o > 0 ? T(i, o, s.width, s.height, n) : !1;
 			if (!(n > 1.01 || c)) {
 				t.style.cursor = "";
 				return;
@@ -6573,7 +6576,7 @@ function $n({ overlay: e, content: t, singleView: n, abView: r, sideView: i, sta
 		} catch {
 			return n || t || null;
 		}
-	}, E = (e, t, n, r, i) => {
+	}, T = (e, t, n, r, i) => {
 		try {
 			let a = S(e, t, n, r);
 			if (!(a.w > 0 && a.h > 0)) return !1;
@@ -6613,7 +6616,7 @@ function $n({ overlay: e, content: t, singleView: n, abView: r, sideView: i, sta
 		if (!e || e.style.display === "none" || ne(n?.target)) return;
 		let r = Number(a?.zoom) || 1, i = (() => {
 			try {
-				return !!T?.VIEWER_ALLOW_PAN_AT_ZOOM_1;
+				return !!E?.VIEWER_ALLOW_PAN_AT_ZOOM_1;
 			} catch {
 				return !1;
 			}
@@ -6625,7 +6628,7 @@ function $n({ overlay: e, content: t, singleView: n, abView: r, sideView: i, sta
 					w: 0,
 					h: 0
 				}, a = m();
-				return !a || !(t > 0 && n > 0) ? r > 1.01 : r > 1.01 || E(t, n, a.width, a.height, r);
+				return !a || !(t > 0 && n > 0) ? r > 1.01 : r > 1.01 || T(t, n, a.width, a.height, r);
 			} catch {
 				return r > 1.01;
 			}
@@ -6656,7 +6659,7 @@ function $n({ overlay: e, content: t, singleView: n, abView: r, sideView: i, sta
 			return;
 		}
 		let o = n.button === 0, c = n.button === 1;
-		if (!(!o && !c)) {
+		if (o || c) {
 			try {
 				let e = n.target;
 				if (e && (e.tagName === "INPUT" || e.tagName === "TEXTAREA" || e.tagName === "SELECT" || e.isContentEditable)) return;
@@ -6739,7 +6742,7 @@ function $n({ overlay: e, content: t, singleView: n, abView: r, sideView: i, sta
 			y();
 		}
 	}, N = (n) => {
-		if (!(!e || e.style.display === "none")) {
+		if (e && e.style.display !== "none") {
 			try {
 				if (!t?.contains?.(n.target)) return;
 			} catch (e) {
@@ -6987,7 +6990,7 @@ function ar(e) {
 //#endregion
 //#region ui/features/viewer/videoProcessor.ts
 function or({ canvas: e, videoEl: t, disableWebGL: n, pauseDuringExecution: r = null, getGradeParams: i, isDefaultGrade: a, _tonemap: o, maxProcPixelsVideo: s, throttleFps: c, safeAddListener: l, safeCall: u, onReady: d } = {}) {
-	let f = r == null ? !!T?.VIEWER_PAUSE_DURING_EXECUTION : !!r, p = null;
+	let f = r == null ? !!E?.VIEWER_PAUSE_DURING_EXECUTION : !!r, p = null;
 	if (!n && ir()) try {
 		p = ar({
 			canvas: e,
@@ -7139,7 +7142,7 @@ function or({ canvas: e, videoEl: t, disableWebGL: n, pauseDuringExecution: r = 
 		} catch (e) {
 			console.debug?.(e);
 		}
-	}, E = () => {
+	}, T = () => {
 		if (!y._destroyed && e?.isConnected && (y.ready || S(), y.ready)) {
 			try {
 				let e = y.lastParams || i?.() || {};
@@ -7217,7 +7220,7 @@ function or({ canvas: e, videoEl: t, disableWebGL: n, pauseDuringExecution: r = 
 		y._rendering = !0;
 		try {
 			y._rafIdSchedule = requestAnimationFrame(() => {
-				y._rafIdSchedule = null, y._rendering = !1, E();
+				y._rafIdSchedule = null, y._rendering = !1, T();
 				try {
 					r && (y._lastHeavyRenderAt = Date.now());
 				} catch (e) {
@@ -7511,7 +7514,7 @@ function cr(e) {
 		console.debug?.(e);
 	}
 	try {
-		let e = String(T?.VIEWER_AUDIO_VISUALIZER_MODE || "simple").toLowerCase();
+		let e = String(E?.VIEWER_AUDIO_VISUALIZER_MODE || "simple").toLowerCase();
 		if (e === "artistic") return "artistic";
 		if (e === "webgl3d" || e === "webgl") return "simple";
 	} catch (e) {
@@ -7666,7 +7669,7 @@ function ur(e, { pseudo3d: t = !1 } = {}) {
 }
 function dr({ canvas: e, audioEl: t, mode: n, pauseDuringExecution: r = null } = {}) {
 	if (!e || !t) return { destroy() {} };
-	let i = r == null ? !!T?.VIEWER_PAUSE_DURING_EXECUTION : !!r, a = null, o = !1, s = null, c = null, l = null, u = null, d = null, f = null, p = 0, m = !1, h = 1e3 / sr(T?.VIEWER_AUDIO_VIS_FPS ?? 24, 8, 60), g = cr(n), _ = () => {
+	let i = r == null ? !!E?.VIEWER_PAUSE_DURING_EXECUTION : !!r, a = null, o = !1, s = null, c = null, l = null, u = null, d = null, f = null, p = 0, m = !1, h = 1e3 / sr(E?.VIEWER_AUDIO_VIS_FPS ?? 24, 8, 60), g = cr(n), _ = () => {
 		try {
 			let t = sr(window.devicePixelRatio || 1, 1, 2), n = Math.max(32, Math.floor((e.clientWidth || 640) * t)), r = Math.max(24, Math.floor((e.clientHeight || 140) * t));
 			e.width !== n && (e.width = n), e.height !== r && (e.height = r);
@@ -7687,7 +7690,7 @@ function dr({ canvas: e, audioEl: t, mode: n, pauseDuringExecution: r = null } =
 			console.debug?.(e);
 		}
 		try {
-			g === "artistic" && !T?.VIEWER_DISABLE_WEBGL_AUDIO && (f = ur(e, { pseudo3d: !0 }));
+			g === "artistic" && !E?.VIEWER_DISABLE_WEBGL_AUDIO && (f = ur(e, { pseudo3d: !0 }));
 		} catch (e) {
 			console.debug?.(e);
 		}
@@ -7713,7 +7716,7 @@ function dr({ canvas: e, audioEl: t, mode: n, pauseDuringExecution: r = null } =
 				a = null;
 				return;
 			}
-			if (!m && !(!l || !f) && !(e - p < h)) {
+			if (!m && l && f && !(e - p < h)) {
 				p = e;
 				try {
 					_(), l.getByteFrequencyData(u), l.getByteTimeDomainData(d), f.draw(u, d, e);
@@ -7743,7 +7746,7 @@ function dr({ canvas: e, audioEl: t, mode: n, pauseDuringExecution: r = null } =
 		a = null;
 	}, C = () => {
 		x();
-	}, w = () => S(), E = () => S(), O = () => _(), k = (e) => {
+	}, w = () => S(), T = () => S(), O = () => _(), k = (e) => {
 		if (i) {
 			if (m = !!String(e?.detail?.active_prompt_id || "").trim(), m) {
 				S();
@@ -7758,7 +7761,7 @@ function dr({ canvas: e, audioEl: t, mode: n, pauseDuringExecution: r = null } =
 		console.debug?.(e);
 	}
 	try {
-		t.addEventListener("play", C, { passive: !0 }), t.addEventListener("pause", w, { passive: !0 }), t.addEventListener("ended", E, { passive: !0 }), window.addEventListener("resize", O, { passive: !0 }), i && (window.addEventListener(D.RUNTIME_STATUS, k), String(window?.__MJR_EXECUTION_RUNTIME__?.active_prompt_id || "").trim() && (m = !0));
+		t.addEventListener("play", C, { passive: !0 }), t.addEventListener("pause", w, { passive: !0 }), t.addEventListener("ended", T, { passive: !0 }), window.addEventListener("resize", O, { passive: !0 }), i && (window.addEventListener(D.RUNTIME_STATUS, k), String(window?.__MJR_EXECUTION_RUNTIME__?.active_prompt_id || "").trim() && (m = !0));
 	} catch (e) {
 		console.debug?.(e);
 	}
@@ -7770,7 +7773,7 @@ function dr({ canvas: e, audioEl: t, mode: n, pauseDuringExecution: r = null } =
 			if (!o) {
 				o = !0, S();
 				try {
-					t.removeEventListener("play", C), t.removeEventListener("pause", w), t.removeEventListener("ended", E), window.removeEventListener("resize", O), window.removeEventListener(D.RUNTIME_STATUS, k);
+					t.removeEventListener("play", C), t.removeEventListener("pause", w), t.removeEventListener("ended", T), window.removeEventListener("resize", O), window.removeEventListener(D.RUNTIME_STATUS, k);
 				} catch (e) {
 					console.debug?.(e);
 				}
@@ -7975,7 +7978,7 @@ function fr({ overlay: e, state: t, mediaTransform: n, updateMediaNaturalSize: r
 		} catch (e) {
 			console.debug?.(e);
 		}
-	}, E = (e, n, { compare: r = !1 } = {}) => {
+	}, T = (e, n, { compare: r = !1 } = {}) => {
 		let i = document.createElement("div");
 		if (i.className = "mjr-viewer-audio-shell", !r) {
 			let t = document.createElement("div");
@@ -8058,7 +8061,7 @@ function fr({ overlay: e, state: t, mediaTransform: n, updateMediaNaturalSize: r
 			}
 			return t;
 		}
-		if (v === "audio") return E(e, m, { compare: !1 });
+		if (v === "audio") return T(e, m, { compare: !1 });
 		if (v === "video") {
 			let u = document.createElement("canvas");
 			u.className = "mjr-viewer-media";
@@ -8085,8 +8088,8 @@ function fr({ overlay: e, state: t, mediaTransform: n, updateMediaNaturalSize: r
 				u._mjrProc = or({
 					canvas: u,
 					videoEl: v,
-					disableWebGL: f || !!T.VIEWER_DISABLE_WEBGL_VIDEO,
-					pauseDuringExecution: T.VIEWER_PAUSE_DURING_EXECUTION,
+					disableWebGL: f || !!E.VIEWER_DISABLE_WEBGL_VIDEO,
+					pauseDuringExecution: E.VIEWER_PAUSE_DURING_EXECUTION,
 					getGradeParams: s,
 					isDefaultGrade: c,
 					tonemap: l,
@@ -8236,7 +8239,7 @@ function fr({ overlay: e, state: t, mediaTransform: n, updateMediaNaturalSize: r
 			}
 			return t;
 		}
-		if (m === "audio") return E(e, f, { compare: !0 });
+		if (m === "audio") return T(e, f, { compare: !0 });
 		if (m === "video") {
 			let u = document.createElement("div");
 			u.style.cssText = "width:100%; height:100%; position:relative; display:flex; align-items:center; justify-content:center;";
@@ -8265,7 +8268,7 @@ function fr({ overlay: e, state: t, mediaTransform: n, updateMediaNaturalSize: r
 				m._mjrProc = or({
 					canvas: m,
 					videoEl: h,
-					pauseDuringExecution: T.VIEWER_PAUSE_DURING_EXECUTION,
+					pauseDuringExecution: E.VIEWER_PAUSE_DURING_EXECUTION,
 					getGradeParams: s,
 					isDefaultGrade: c,
 					tonemap: l,
@@ -9348,7 +9351,7 @@ function Br({ state: e, buildAssetViewURL: t, onNavigate: n, onCompare: r }) {
 			return !1;
 		}
 	}, _ = (e, t = 1.08) => {
-		if (!(!e || g())) {
+		if (e && !g()) {
 			try {
 				e._mjrFilmstripBounce?.cancel?.();
 			} catch (e) {
@@ -9430,7 +9433,7 @@ function Br({ state: e, buildAssetViewURL: t, onNavigate: n, onCompare: r }) {
 					b(r);
 				}, { once: !0 }), r.appendChild(n);
 			} else b(r);
-			return T(r), r;
+			return E(r), r;
 		}
 		if (a === "model3d") {
 			let n = (() => {
@@ -9442,7 +9445,7 @@ function Br({ state: e, buildAssetViewURL: t, onNavigate: n, onCompare: r }) {
 						...e,
 						filename: r,
 						kind: "image"
-					}) : E(r, i || null, a);
+					}) : w(r, i || null, a);
 				} catch {
 					return "";
 				}
@@ -9458,7 +9461,7 @@ function Br({ state: e, buildAssetViewURL: t, onNavigate: n, onCompare: r }) {
 					C(r);
 				}, { once: !0 }), r.appendChild(t);
 			} else C(r);
-			return w(r), r;
+			return T(r), r;
 		}
 		if (o) {
 			let e = document.createElement("img");
@@ -9514,11 +9517,11 @@ function Br({ state: e, buildAssetViewURL: t, onNavigate: n, onCompare: r }) {
 			console.debug?.(e);
 		}
 	}
-	function w(e) {
+	function T(e) {
 		let t = document.createElement("div");
 		t.style.cssText = "\n            position: absolute; bottom: 2px; right: 2px;\n            font-size: 7px; line-height: 1;\n            background: rgba(0,0,0,0.55); color: rgba(76, 175, 80, 0.95);\n            padding: 2px 3px; border-radius: 2px;\n            pointer-events: none;\n            letter-spacing: 0.02em;\n            font-weight: 700;\n        ", t.textContent = "3D", e.appendChild(t);
 	}
-	function T(e) {
+	function E(e) {
 		let t = document.createElement("div");
 		t.style.cssText = "\n            position: absolute; bottom: 2px; right: 2px;\n            font-size: 7px; line-height: 1;\n            background: rgba(0,0,0,0.55); color: rgba(255,255,255,0.85);\n            padding: 2px 3px; border-radius: 2px;\n            pointer-events: none;\n            letter-spacing: 0.02em;\n        ", t.textContent = "AUD", e.appendChild(t);
 	}
@@ -9744,13 +9747,13 @@ var Wr = null, Gr = null, Kr = null, qr = null, Jr = null, Yr = null;
 function Xr() {
 	Wr || import("./abCompare-BXOoRlmV.js").then((e) => {
 		Wr = e;
-	}), Gr || import("./sideBySide-BqUyrNow.js").then((e) => {
+	}), Gr || import("./sideBySide-DQgI1BHH.js").then((e) => {
 		Gr = e;
-	}), Kr || import("./model3dRenderer-CWRtZrSS.js").then((e) => e.t).then((e) => {
+	}), Kr || import("./model3dRenderer-JLnYDjnt.js").then((e) => e.t).then((e) => {
 		Kr = e;
 	}), qr || import("./scopes-Dx5cTyCY.js").then((e) => {
 		qr = e;
-	}), Jr || import("./genInfo-uII4WbQm.js").then((e) => e.n).then((e) => {
+	}), Jr || import("./genInfo-BJJurQEA.js").then((e) => e.n).then((e) => {
 		Jr = e;
 	}), Yr || import("./frameExport-tksSZ7sb.js").then((e) => {
 		Yr = e;
@@ -9814,21 +9817,21 @@ function Zr() {
 			console.debug?.(e);
 		}
 	}
-	function v() {
+	function b() {
 		try {
 			l?.updatePanCursor?.();
 		} catch (e) {
 			console.debug?.(e);
 		}
 	}
-	function y() {
+	function x() {
 		try {
 			return l?.getPrimaryMedia?.() || null;
 		} catch {
 			return null;
 		}
 	}
-	function x(e) {
+	function S(e) {
 		try {
 			return l?.getMediaNaturalSize?.(e) || {
 				w: 0,
@@ -9841,21 +9844,21 @@ function Zr() {
 			};
 		}
 	}
-	function S() {
+	function w() {
 		try {
 			return l?.getViewportRect?.() || null;
 		} catch {
 			return null;
 		}
 	}
-	function E() {
+	function D() {
 		try {
 			return l?.computeOneToOneZoom?.() ?? null;
 		} catch {
 			return null;
 		}
 	}
-	function D() {
+	function k() {
 		try {
 			l?.updateMediaNaturalSize?.();
 		} catch (e) {
@@ -9970,7 +9973,7 @@ function Zr() {
 			onZoomOneToOne: () => {
 				try {
 					let e = () => {
-						let e = E();
+						let e = D();
 						return e != null && (_(Math.abs((Number(o.zoom) || 1) - e) < .01 ? 1 : e, {
 							clientX: o._lastPointerX,
 							clientY: o._lastPointerY
@@ -9980,7 +9983,7 @@ function Zr() {
 					try {
 						requestAnimationFrame(() => {
 							try {
-								D();
+								k();
 							} catch (e) {
 								console.debug?.(e);
 							}
@@ -10083,7 +10086,7 @@ function Zr() {
 	}
 	let { contentRow: z, content: fe, singleView: B, abView: V, sideView: H, overlayLayer: pe, gridCanvas: U, probeTooltip: me, loupeWrap: he, loupeCanvas: ge, genInfoOverlay: _e, genInfoTitle: W, genInfoBody: G, genInfoOverlayLeft: K, genInfoTitleLeft: ve, genInfoBodyLeft: ye, footer: q, prevBtn: be, indexInfo: xe, nextBtn: Se, navBar: Ce, playerBarHost: we, filmstrip: Te } = Hr({
 		state: o,
-		buildAssetViewURL: O,
+		buildAssetViewURL: y,
 		onNavigate: (e) => {
 			try {
 				o.compareAsset != null && (o.compareAsset = null, o.mode = $.SINGLE), o.currentIndex = e, Qe();
@@ -10132,7 +10135,7 @@ function Zr() {
 	let Oe = Zn({
 		state: o,
 		VIEWER_MODES: $,
-		APP_CONFIG: T,
+		APP_CONFIG: E,
 		getAssetMetadata: s,
 		getAssetsBatch: r
 	}), ke = 3e5, Ae = /* @__PURE__ */ new Map(), je = () => {
@@ -10242,7 +10245,7 @@ function Zr() {
 			}
 			return null;
 		},
-		getViewportRect: S,
+		getViewportRect: w,
 		clearCanvas: Fe
 	}), Re = () => {
 		let t = (() => {
@@ -10793,7 +10796,7 @@ function Zr() {
 	function et() {
 		let e = o.assets[o.currentIndex];
 		if (!e) return;
-		let t = O(e);
+		let t = y(e);
 		if (!t) {
 			try {
 				Fn(B);
@@ -10823,7 +10826,7 @@ function Zr() {
 			state: o,
 			currentAsset: e,
 			viewUrl: t,
-			buildAssetViewURL: O,
+			buildAssetViewURL: y,
 			createCompareMediaElement: j,
 			destroyMediaProcessorsIn: Fn
 		}) : o.mode === $.SIDE_BY_SIDE && Y() && Gr?.renderSideBySideView?.({
@@ -10831,19 +10834,19 @@ function Zr() {
 			state: o,
 			currentAsset: e,
 			viewUrl: t,
-			buildAssetViewURL: O,
+			buildAssetViewURL: y,
 			createMediaElement: A,
 			destroyMediaProcessorsIn: Fn
 		});
-		g(), v();
+		g(), b();
 	}
 	let { preloadAdjacentAssets: tt, preloadImageForAsset: nt, trackPreloadRef: rt } = pr({
-		buildAssetViewURL: O,
+		buildAssetViewURL: y,
 		IMAGE_PRELOAD_EXTENSIONS: c,
 		state: o
 	}), { destroyPlayerBar: at, syncPlayerBar: ot } = Sr({
 		state: o,
-		APP_CONFIG: T,
+		APP_CONFIG: E,
 		VIEWER_MODES: $,
 		overlay: e,
 		navBar: Ce,
@@ -10861,7 +10864,7 @@ function Zr() {
 		scheduleOverlayRedraw: J,
 		viewerInfoCacheGet: Me,
 		viewerInfoCacheSet: Ne
-	}), st = () => ot(), ct = T.VIEWER_MAX_PROC_PIXELS ?? 12e6, lt = () => ({
+	}), st = () => ot(), ct = E.VIEWER_MAX_PROC_PIXELS ?? 12e6, lt = () => ({
 		exposureEV: Number(o.exposureEV) || 0,
 		gamma: Math.max(.1, Math.min(3, Number(o.gamma) || 1)),
 		channel: o.channel || "rgb",
@@ -10893,13 +10896,13 @@ function Zr() {
 		} catch {
 			return !0;
 		}
-	}, ft = T.VIEWER_MAX_PROC_PIXELS_VIDEO ?? 3e6, pt = T.VIEWER_VIDEO_GRADE_THROTTLE_FPS ?? 15;
+	}, ft = E.VIEWER_MAX_PROC_PIXELS_VIDEO ?? 3e6, pt = E.VIEWER_VIDEO_GRADE_THROTTLE_FPS ?? 15;
 	try {
 		d = fr({
 			overlay: e,
 			state: o,
 			mediaTransform: f,
-			updateMediaNaturalSize: D,
+			updateMediaNaturalSize: k,
 			clampPanToBounds: h,
 			applyTransform: g,
 			scheduleOverlayRedraw: J,
@@ -10908,7 +10911,7 @@ function Zr() {
 			tonemap: null,
 			maxProcPixels: ct,
 			maxProcPixelsVideo: ft,
-			disableWebGL: !!T.VIEWER_DISABLE_WEBGL_VIDEO,
+			disableWebGL: !!E.VIEWER_DISABLE_WEBGL_VIDEO,
 			videoGradeThrottleFps: pt,
 			safeAddListener: Z,
 			safeCall: X
@@ -10977,7 +10980,7 @@ function Zr() {
 		});
 	}, yt = (e, t, n, { offsetX: r = 16, offsetY: i = 16 } = {}) => {
 		try {
-			let a = S();
+			let a = w();
 			if (!a) return;
 			let o = fe.getBoundingClientRect(), s = (Number(t) || 0) - o.left, c = (Number(n) || 0) - o.top, l = Number(e.offsetWidth) || 0, u = Number(e.offsetHeight) || 0, d = s + r, f = c + i;
 			d = Math.max(10, Math.min(d, a.width - l - 10)), f = Math.max(10, Math.min(f, a.height - u - 10)), e.style.left = `${Math.round(d)}px`, e.style.top = `${Math.round(f)}px`;
@@ -10989,9 +10992,9 @@ function Zr() {
 		content: fe,
 		state: o,
 		VIEWER_MODES: $,
-		getPrimaryMedia: y,
-		getMediaNaturalSize: x,
-		getViewportRect: S,
+		getPrimaryMedia: x,
+		getMediaNaturalSize: S,
+		getViewportRect: w,
 		positionOverlayBox: yt,
 		probeTooltip: me,
 		loupeWrap: he,
@@ -10999,7 +11002,7 @@ function Zr() {
 			state: o,
 			loupeCanvas: ge,
 			loupeWrap: he,
-			getMediaNaturalSize: x,
+			getMediaNaturalSize: S,
 			positionOverlayBox: yt
 		}).redraw,
 		lifecycle: n
@@ -11041,7 +11044,7 @@ function Zr() {
 		singleView: B,
 		state: o,
 		VIEWER_MODES: $,
-		computeOneToOneZoom: E,
+		computeOneToOneZoom: D,
 		setZoom: _,
 		scheduleOverlayRedraw: J,
 		scheduleApplyGrade: ht,
@@ -11052,7 +11055,7 @@ function Zr() {
 		renderBadges: Ye,
 		updateAssetRating: t,
 		safeDispatchCustomEvent: ce,
-		ASSET_RATING_CHANGED_EVENT: k,
+		ASSET_RATING_CHANGED_EVENT: O,
 		probeTooltip: me,
 		loupeWrap: he,
 		renderGenInfoPanel: Ke,
@@ -11152,7 +11155,7 @@ function Zr() {
 		}
 	};
 	try {
-		e._mjrBadgeSyncBound ||= (i.push(Z(window, k, (e) => {
+		e._mjrBadgeSyncBound ||= (i.push(Z(window, O, (e) => {
 			try {
 				let t = e?.detail?.assetId, n = e?.detail?.rating;
 				if (t == null) return;
@@ -11166,7 +11169,7 @@ function Zr() {
 			} catch (e) {
 				console.debug?.(e);
 			}
-		}, { passive: !0 })), i.push(Z(window, w, (e) => {
+		}, { passive: !0 })), i.push(Z(window, T, (e) => {
 			try {
 				let t = e?.detail?.assetId, n = e?.detail?.tags;
 				if (t == null) return;
@@ -11187,7 +11190,7 @@ function Zr() {
 	function Tt() {
 		try {
 			let e = o.assets?.[o.currentIndex];
-			e?.id && ce(b, { assetId: String(e.id) }, { warnPrefix: "[ViewerRuntime]" });
+			e?.id && ce(v, { assetId: String(e.id) }, { warnPrefix: "[ViewerRuntime]" });
 		} catch (e) {
 			console.debug?.(e);
 		}
@@ -11516,7 +11519,7 @@ function Zr() {
 		En({
 			overlayEl: e,
 			getCurrentAsset: () => o.assets[o.currentIndex],
-			getCurrentViewUrl: (e) => O(e),
+			getCurrentViewUrl: (e) => y(e),
 			onAssetChanged: () => {
 				try {
 					Ye();

@@ -94,6 +94,7 @@ Move useful assets and workflow context back into ComfyUI:
 - stage files into the ComfyUI input directory
 - save, import, categorize, thumbnail, and reload workflow JSON files from the Workflow tab
 - import or inspect embedded workflows without losing the current review flow
+- click **Open workflow** on an image/video card or in either viewer to reopen its saved workflow in a new ComfyUI tab; execution-only metadata uses ComfyUI's API graph importer
 - export originals, clean metadata-stripped files, or selected files as a ZIP
 
 ---

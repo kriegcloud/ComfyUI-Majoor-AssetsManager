@@ -7,6 +7,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import AssetCardInner from "../vue/components/grid/AssetCardInner.vue";
 import { APP_CONFIG } from "../app/config.js";
 import { MediaBlobCache } from "../features/grid/MediaBlobCache.js";
+import { openAssetWorkflow } from "../features/workflows/openAssetWorkflow.js";
+
+vi.mock("../features/workflows/openAssetWorkflow.js", () => ({ openAssetWorkflow: vi.fn(async () => true) }));
 
 vi.mock("../features/grid/MediaBlobCache.js", () => ({
     MediaBlobCache: {
@@ -53,6 +56,19 @@ describe("AssetCardInner media display", () => {
                 disconnect() {}
             },
         );
+    });
+
+    it.each(["image", "video"])("opens the selected %s's workflow with one click", async (kind) => {
+        const asset = { id: 7, kind, filename: kind === "image" ? "image.png" : "clip.mp4" };
+        const wrapper = mount(AssetCardInner, {
+            props: { asset },
+            global: assetCardGlobal({ stubs: { MButton: buttonStub } }),
+        });
+        const action = wrapper.find(".mjr-card-open-workflow");
+        expect(action.text()).toBe("Open workflow");
+        await action.trigger("click");
+        expect(openAssetWorkflow).toHaveBeenCalledWith(asset);
+        wrapper.unmount();
     });
 
     it("uses stable /view URL and display_name for image cards", () => {

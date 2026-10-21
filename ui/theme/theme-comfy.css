@@ -9973,3 +9973,13 @@ body.mjr-mfv-popout-body {
         max-width: 100%;
     }
 }
+
+/* Keep the media-to-workflow action visible without covering hover prompt text. */
+.mjr-assets-manager .mjr-card-open-workflow {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    z-index: 5;
+    padding: 4px 8px;
+    background: var(--comfy-menu-bg, #202020);
+}

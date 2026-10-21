@@ -11,7 +11,9 @@ import type { MjrAssetLike } from "../../../types/asset";
  * Phase 4.2 - full inner card replacement.
  */
 import { computed, inject, ref, watch, watchEffect, onMounted, onBeforeUnmount, onUnmounted } from "vue";
+import { t } from "../../../app/i18n.js";
 import { buildAssetViewURL, buildThumbnailURL } from "../../../api/endpoints.js";
+import { openAssetWorkflow } from "../../../features/workflows/openAssetWorkflow.js";
 import {
     genTimeColor,
     createWorkflowDot,
@@ -266,6 +268,13 @@ const emit = defineEmits<{ "workflow-action": [payload: { type: string; event: E
 
 const kind = computed(() => String(props.asset.kind || "image").toLowerCase());
 const isWorkflow = computed(() => kind.value === "workflow");
+const openingWorkflow = ref(false);
+async function openSavedWorkflow() {
+    if (openingWorkflow.value) return;
+    openingWorkflow.value = true;
+    try { await openAssetWorkflow(props.asset); }
+    finally { openingWorkflow.value = false; }
+}
 const isImage = computed(() => kind.value === "image");
 const isVideo = computed(() => kind.value === "video");
 const isAudio = computed(() => kind.value === "audio");
@@ -894,6 +903,18 @@ function emitWorkflowAction(action: unknown, event?: Event) {
             <span class="mjr-live-pill-dot" aria-hidden="true" />
             <span>{{ livePlaceholderLabel }}</span>
         </div>
+
+        <MButton
+            v-if="(kind === 'image' || kind === 'video') && !isLivePlaceholder"
+            type="button"
+            class="mjr-icon-btn mjr-card-open-workflow"
+            :disabled="openingWorkflow"
+            :aria-busy="openingWorkflow"
+            :title="t('tooltip.openAssetWorkflow', 'Open this media’s saved workflow or execution settings in a new ComfyUI tab')"
+            @pointerdown.stop
+            @click.stop="openSavedWorkflow"
+            @dblclick.stop
+        >{{ t("btn.openAssetWorkflow", "Open workflow") }}</MButton>
 
         <!-- Hover info overlay -->
         <div

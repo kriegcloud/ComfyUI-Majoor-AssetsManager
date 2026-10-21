@@ -23,6 +23,7 @@
  */
 
 import type { MajoorComfyApp, MajoorComfyApi, MajoorExtensionManager } from "../types/comfyui-frontend.js";
+import { createUniqueId } from "../utils/ids.js";
 import {
     activateBottomPanelTabCompat,
     activateSidebarTabCompat,
@@ -873,6 +874,31 @@ export function importWorkflowPreferHostTab(
         console.debug?.(e);
     }
     return { ok: false, mode: "none" };
+}
+
+/** Use ComfyUI's native import lifecycle to retain the previous workflow tab. */
+export async function openWorkflowInHostTab(
+    graph: Record<string, any>,
+    filename: string,
+    format: "workflow" | "prompt" = "workflow",
+    app: any = null,
+): Promise<boolean> {
+    try {
+        const runtimeApp = app || _app || getComfyApp();
+        if (!graph || typeof graph !== "object") return false;
+        const loader = format === "workflow" ? runtimeApp?.loadGraphData : runtimeApp?.loadApiJson;
+        if (typeof loader !== "function") return false;
+        // Host loaders mutate their input. Keep indexed metadata and viewer state intact.
+        const snapshot = JSON.parse(JSON.stringify(graph));
+        // A unique import name prevents a repeated click from replacing an existing tab.
+        const title = `${filename.replace(/\.[^.]+$/, "")} - ${createUniqueId("", 4)}.json`;
+        const result = format === "workflow"
+            ? await loader.call(runtimeApp, snapshot, true, true, title)
+            : await loader.call(runtimeApp, snapshot, title);
+        return result !== false;
+    } catch {
+        return false;
+    }
 }
 
 export function serializeCurrentHostWorkflow(app: any = null): any {

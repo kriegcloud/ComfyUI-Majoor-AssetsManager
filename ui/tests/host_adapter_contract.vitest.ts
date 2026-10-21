@@ -353,6 +353,38 @@ describe("hostAdapter contract", () => {
         expect(app.loadGraphData).toHaveBeenCalledWith(workflow);
     });
 
+    it("opens media workflows with the native named-import lifecycle and isolates metadata", async () => {
+        const mod = await import("../app/hostAdapter.js");
+        const workflow = { nodes: [{ id: 1, widgets_values: [123] }], links: [] };
+        const loadGraphData = vi.fn(async (graph: any, _clean: boolean, _restoreView: boolean, _name: string) => { graph.nodes[0].widgets_values[0] = 999; });
+        const app = { loadGraphData };
+        await expect(mod.openWorkflowInHostTab(workflow, "sample.png", "workflow", app)).resolves.toBe(true);
+        expect(loadGraphData).toHaveBeenCalledWith(expect.any(Object), true, true, expect.stringMatching(/^sample - .+\.json$/));
+        expect(workflow.nodes[0].widgets_values).toEqual([123]);
+        await mod.openWorkflowInHostTab(workflow, "sample.png", "workflow", app);
+        expect(loadGraphData.mock.calls[0][3]).not.toBe(loadGraphData.mock.calls[1][3]);
+    });
+
+    it("awaits native import failures and does not fall back to replacing the graph", async () => {
+        const mod = await import("../app/hostAdapter.js");
+        const configure = vi.fn();
+        const app = { loadGraphData: vi.fn().mockRejectedValue(new Error("load failed")), graph: { configure } };
+        await expect(mod.openWorkflowInHostTab({ nodes: [], links: [] }, "a.png", "workflow", app)).resolves.toBe(false);
+        expect(configure).not.toHaveBeenCalled();
+        app.loadGraphData.mockResolvedValue(false);
+        await expect(mod.openWorkflowInHostTab({ nodes: [], links: [] }, "a.png", "workflow", app)).resolves.toBe(false);
+    });
+
+    it("uses the native API importer for execution settings and fails safely on unsupported hosts", async () => {
+        const mod = await import("../app/hostAdapter.js");
+        const prompt = { "1": { class_type: "KSampler", inputs: { seed: 123 } } };
+        const app = { loadApiJson: vi.fn().mockResolvedValue(undefined), loadGraphData: vi.fn() };
+        await expect(mod.openWorkflowInHostTab(prompt, "a.mp4", "prompt", app)).resolves.toBe(true);
+        expect(app.loadApiJson).toHaveBeenCalledWith(prompt, expect.stringMatching(/^a - .+\.json$/));
+        expect(app.loadGraphData).not.toHaveBeenCalled();
+        await expect(mod.openWorkflowInHostTab(prompt, "a.mp4", "prompt", {})).resolves.toBe(false);
+    });
+
     it("serializes current workflow from graphToPrompt workflow payload", async () => {
         const mod = await import("../app/hostAdapter.js");
 

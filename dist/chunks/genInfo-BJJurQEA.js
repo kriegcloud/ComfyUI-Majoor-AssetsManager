@@ -1,15 +1,15 @@
 import { t as e } from "./rolldown-runtime-Dy4uBu1J.js";
-import { m as t, o as n } from "./events-DrYpMD-I.js";
-import { h as r } from "./Viewer-h3j-Fa-c.js";
-import { i, n as a, r as o, t as s, u as c } from "./SidebarWorkflowSection-BZSMmdRA.js";
-import { D as l, E as u, N as d, O as f, T as p, V as m, dt as h, ft as g, k as _, lt as v } from "./mjr-primevue-BlSRoWcG.js";
+import { m as t, o as n } from "./events-DXdLblY2.js";
+import { h as r } from "./Viewer-BkYWLmB5.js";
+import { b as i, c as a, h as o, l as s, s as c, t as l } from "./SidebarWorkflowSection-DvOLlR6w.js";
+import { A as u, D as d, E as f, G as p, J as m, N as h, O as g, T as _, V as v, dt as y, ft as b, k as x, lt as S, rt as ee } from "./mjr-primevue-BOf2ACk_.js";
 //#region ui/vue/components/viewer/ViewerMetadataBlock.vue?vue&type=script&setup=true&lang.ts
-var y = { style: {
+var C = { style: {
 	display: "flex",
 	"flex-direction": "column",
 	gap: "10px",
 	"margin-bottom": "14px"
-} }, b = {
+} }, w = {
 	key: 0,
 	style: {
 		"font-size": "12px",
@@ -17,8 +17,8 @@ var y = { style: {
 		"letter-spacing": "0.02em",
 		color: "rgba(255,255,255,0.86)"
 	}
-}, x = {
-	key: 1,
+}, T = {
+	key: 2,
 	style: {
 		padding: "10px 12px",
 		"border-radius": "10px",
@@ -27,22 +27,22 @@ var y = { style: {
 		color: "rgba(255,255,255,0.86)",
 		"white-space": "pre-wrap"
 	}
-}, S = { style: {
+}, E = { style: {
 	"font-size": "12px",
 	"font-weight": "700",
 	"margin-bottom": "6px"
-} }, C = { style: {
+} }, D = { style: {
 	"font-size": "12px",
 	opacity: "0.88"
-} }, w = { style: {
+} }, O = { style: {
 	"font-size": "12px",
 	"font-weight": "700",
 	"margin-bottom": "6px"
-} }, T = { style: {
+} }, k = { style: {
 	"font-size": "12px",
 	opacity: "0.9"
-} }, E = {
-	key: 6,
+} }, A = {
+	key: 7,
 	style: {
 		padding: "10px 12px",
 		"border-radius": "10px",
@@ -50,20 +50,20 @@ var y = { style: {
 		background: "rgba(255,255,255,0.06)",
 		color: "rgba(255,255,255,0.72)"
 	}
-}, D = {
-	key: 7,
+}, j = {
+	key: 8,
 	style: {
 		border: "1px solid rgba(255,255,255,0.10)",
 		"border-radius": "10px",
 		background: "rgba(255,255,255,0.04)",
 		overflow: "hidden"
 	}
-}, O = { style: {
+}, M = { style: {
 	cursor: "pointer",
 	padding: "10px 12px",
 	color: "rgba(255,255,255,0.78)",
 	"user-select": "none"
-} }, k = { style: {
+} }, te = { style: {
 	margin: "0",
 	padding: "10px 12px",
 	"max-height": "280px",
@@ -71,7 +71,7 @@ var y = { style: {
 	"font-size": "11px",
 	"line-height": "1.35",
 	color: "rgba(255,255,255,0.86)"
-} }, A = /* @__PURE__ */ d({
+} }, N = /* @__PURE__ */ h({
 	__name: "ViewerMetadataBlock",
 	props: {
 		title: {},
@@ -80,8 +80,18 @@ var y = { style: {
 		onRetry: { type: [Function, null] }
 	},
 	setup(e) {
-		let r = e;
-		function c(e) {
+		let r = e, o = ee(!1);
+		async function h() {
+			if (!o.value) {
+				o.value = !0;
+				try {
+					await i(r.asset || null);
+				} finally {
+					o.value = !1;
+				}
+			}
+		}
+		function N(e) {
 			try {
 				if (!e || typeof e != "object") return null;
 				let t = e?.metadata_raw;
@@ -90,7 +100,7 @@ var y = { style: {
 				return null;
 			}
 		}
-		function d(e) {
+		function P(e) {
 			let t = e?.metadata_raw ?? null;
 			if (!t) return null;
 			if (typeof t == "object") return t;
@@ -104,19 +114,19 @@ var y = { style: {
 				return null;
 			}
 		}
-		function A(e) {
+		function F(e) {
 			try {
 				let t = Object.entries(e || {});
 				if (!t.length) return !1;
 				let n = 0;
-				for (let [, e] of t.slice(0, 50)) if (!(!e || typeof e != "object") && (e.inputs && typeof e.inputs == "object" && (n += 1), n >= 2)) return !0;
+				for (let [, e] of t.slice(0, 50)) if (e && typeof e == "object" && (e.inputs && typeof e.inputs == "object" && (n += 1), n >= 2)) return !0;
 			} catch {
 				return !1;
 			}
 			return !1;
 		}
-		function j(e) {
-			let t = d(e), n = e?.workflow || e?.Workflow || e?.comfy_workflow || t?.workflow || t?.Workflow || t?.comfy_workflow || null;
+		function I(e) {
+			let t = P(e), n = e?.workflow || e?.Workflow || e?.comfy_workflow || t?.workflow || t?.Workflow || t?.comfy_workflow || null;
 			if (!n) return null;
 			if (typeof n == "object") return n;
 			if (typeof n != "string") return null;
@@ -128,81 +138,100 @@ var y = { style: {
 				return null;
 			}
 		}
-		function M(e) {
-			let t = d(e), n = e?.prompt || e?.Prompt || t?.prompt || t?.Prompt || null;
+		function L(e) {
+			let t = P(e), n = e?.prompt || e?.Prompt || t?.prompt || t?.Prompt || null;
 			if (!n) return null;
-			if (typeof n == "object") return A(n) ? n : null;
+			if (typeof n == "object") return F(n) ? n : null;
 			if (typeof n != "string") return null;
 			let r = n.trim();
 			if (!r) return null;
 			try {
 				let e = JSON.parse(r);
-				return A(e) ? e : null;
+				return F(e) ? e : null;
 			} catch {
 				return null;
 			}
 		}
-		function N(e) {
-			return !!(j(e) || M(e));
+		function R(e) {
+			return !!(I(e) || L(e));
 		}
-		function P(e) {
+		function z(e) {
 			let t = e || {}, n = t.generation_time || t.file_creation_time || t.mtime || t.created_at;
 			return !!(t.width && t.height || t.duration && t.duration > 0 || n || t.size && t.size > 0 || t.size_bytes && t.size_bytes >= 0 || t.metadata_raw?.raw_ffprobe || t.id != null || t.job_id || t.file_info?.job_id || t.source_node_id || t.file_info?.source_node_id || t.source_node_type || t.file_info?.source_node_type || t.workflow_id || t.file_info?.workflow_id || t.user_metadata?.workflow?.id || t.metadata?.workflow_id);
 		}
-		function F(e) {
+		function B(e) {
 			if (e == null) return "";
 			let t = typeof e == "string" ? e : JSON.stringify(e, null, 2);
 			return t ? t.length > 4e4 ? `${t.slice(0, 4e4)}\n...(truncated)` : t : "";
 		}
-		function I() {
+		function V() {
 			typeof r.onRetry == "function" && r.onRetry();
 		}
-		let L = p(() => c(r.asset)), R = p(() => o(r.asset)), z = p(() => R.value.kind !== "empty"), B = p(() => P(r.asset)), V = p(() => n.WORKFLOW_MINIMAP_ENABLED !== !1 && N(r.asset)), H = p(() => L.value && typeof L.value == "object" && L.value.kind === "fetch_error"), U = p(() => F(r.asset?.metadata_raw)), W = p(() => !r.loading && !H.value && !B.value && !z.value && !V.value), G = p(() => {
-			if (!H.value) return "";
-			let e = String(L.value?.message || L.value?.error || "Failed to load generation data."), n = String(L.value?.code || L.value?.stage || "").trim();
+		let H = _(() => N(r.asset)), U = _(() => a(r.asset)), W = _(() => U.value.kind !== "empty"), G = _(() => z(r.asset)), K = _(() => n.WORKFLOW_MINIMAP_ENABLED !== !1 && R(r.asset)), q = _(() => H.value && typeof H.value == "object" && H.value.kind === "fetch_error"), J = _(() => B(r.asset?.metadata_raw)), Y = _(() => !r.loading && !q.value && !G.value && !W.value && !K.value), X = _(() => {
+			if (!q.value) return "";
+			let e = String(H.value?.message || H.value?.error || "Failed to load generation data."), n = String(H.value?.code || H.value?.stage || "").trim();
 			return n ? t("viewer.metadataErrorWithCode", "{message}\n\nCode: {code}\nClick to retry.", {
 				message: e,
 				code: n
 			}) : t("viewer.metadataErrorRetry", "{message}\n\nClick to retry.", { message: e });
 		});
-		return (e, n) => (m(), _("div", y, [
-			r.title ? (m(), _("div", b, g(r.title), 1)) : f("", !0),
-			r.loading ? (m(), _("div", x, [u("div", S, g(v(t)("status.loading", "Loading")), 1), u("div", C, g(v(t)("viewer.loadingGenerationData", "Loading generation data...")), 1)])) : f("", !0),
-			H.value ? (m(), _("div", {
-				key: 2,
-				style: h([{
-					padding: "10px 12px",
-					"border-radius": "10px",
-					border: "1px solid rgba(244,67,54,0.35)",
-					background: "rgba(244,67,54,0.08)",
-					color: "rgba(255,255,255,0.9)",
-					"white-space": "pre-wrap"
-				}, { cursor: r.onRetry ? "pointer" : "default" }]),
-				onClick: I
-			}, [u("div", w, g(v(t)("viewer.errorLoadingMetadata", "Error Loading Metadata")), 1), u("div", T, g(G.value), 1)], 4)) : f("", !0),
-			B.value ? (m(), l(i, {
-				key: 3,
-				asset: r.asset
-			}, null, 8, ["asset"])) : f("", !0),
-			z.value ? (m(), l(a, {
-				key: 4,
-				asset: r.asset
-			}, null, 8, ["asset"])) : f("", !0),
-			V.value ? (m(), l(s, {
-				key: 5,
-				asset: r.asset
-			}, null, 8, ["asset"])) : f("", !0),
-			W.value ? (m(), _("div", E, g(v(t)("viewer.noGenerationDataFile", "No generation data found for this file.")), 1)) : f("", !0),
-			U.value ? (m(), _("details", D, [u("summary", O, g(v(t)("msg.rawMetadata", "Raw metadata")), 1), u("pre", k, g(U.value), 1)])) : f("", !0)
-		]));
+		return (e, n) => {
+			let i = p("MButton");
+			return v(), x("div", C, [
+				r.title ? (v(), x("div", w, b(r.title), 1)) : g("", !0),
+				r.asset ? (v(), d(i, {
+					key: 1,
+					type: "button",
+					class: "mjr-icon-btn mjr-open-workflow-btn",
+					disabled: o.value,
+					"aria-busy": o.value,
+					title: S(t)("tooltip.openAssetWorkflow", "Open this media’s saved workflow or execution settings in a new ComfyUI tab"),
+					onClick: h
+				}, {
+					default: m(() => [u(b(S(t)("btn.openAssetWorkflow", "Open workflow")), 1)]),
+					_: 1
+				}, 8, [
+					"disabled",
+					"aria-busy",
+					"title"
+				])) : g("", !0),
+				r.loading ? (v(), x("div", T, [f("div", E, b(S(t)("status.loading", "Loading")), 1), f("div", D, b(S(t)("viewer.loadingGenerationData", "Loading generation data...")), 1)])) : g("", !0),
+				q.value ? (v(), x("div", {
+					key: 3,
+					style: y([{
+						padding: "10px 12px",
+						"border-radius": "10px",
+						border: "1px solid rgba(244,67,54,0.35)",
+						background: "rgba(244,67,54,0.08)",
+						color: "rgba(255,255,255,0.9)",
+						"white-space": "pre-wrap"
+					}, { cursor: r.onRetry ? "pointer" : "default" }]),
+					onClick: V
+				}, [f("div", O, b(S(t)("viewer.errorLoadingMetadata", "Error Loading Metadata")), 1), f("div", k, b(X.value), 1)], 4)) : g("", !0),
+				G.value ? (v(), d(s, {
+					key: 4,
+					asset: r.asset
+				}, null, 8, ["asset"])) : g("", !0),
+				W.value ? (v(), d(c, {
+					key: 5,
+					asset: r.asset
+				}, null, 8, ["asset"])) : g("", !0),
+				K.value ? (v(), d(l, {
+					key: 6,
+					asset: r.asset
+				}, null, 8, ["asset"])) : g("", !0),
+				Y.value ? (v(), x("div", A, b(S(t)("viewer.noGenerationDataFile", "No generation data found for this file.")), 1)) : g("", !0),
+				J.value ? (v(), x("details", j, [f("summary", M, b(S(t)("msg.rawMetadata", "Raw metadata")), 1), f("pre", te, b(J.value), 1)])) : g("", !0)
+			]);
+		};
 	}
-}), j = /* @__PURE__ */ e({
-	buildViewerMetadataBlocks: () => ee,
+}), P = /* @__PURE__ */ e({
+	buildViewerMetadataBlocks: () => ae,
 	ensureViewerMetadataAsset: () => $
-}), M = (e, t = null) => {
+}), F = (e, t = null) => {
 	let n = r(e);
 	return n === void 0 ? t : n;
-}, N = n?.VIEWER_GENINFO_TTL_MS ?? 3e4, P = n?.VIEWER_GENINFO_ERROR_TTL_MS ?? 8e3, F = n?.VIEWER_GENINFO_MAX_ENTRIES ?? 300, I = /* @__PURE__ */ new Map(), L = /* @__PURE__ */ new Map(), R = /* @__PURE__ */ new Map(), z = (e, t, n) => {
+}, I = n?.VIEWER_GENINFO_TTL_MS ?? 3e4, L = n?.VIEWER_GENINFO_ERROR_TTL_MS ?? 8e3, R = n?.VIEWER_GENINFO_MAX_ENTRIES ?? 300, z = /* @__PURE__ */ new Map(), B = /* @__PURE__ */ new Map(), V = /* @__PURE__ */ new Map(), H = (e, t, n) => {
 	try {
 		let r = Date.now();
 		for (let [n, i] of e.entries()) {
@@ -221,27 +250,27 @@ var y = { style: {
 	} catch (e) {
 		console.debug?.(e);
 	}
-}, B = (e, t, n) => {
+}, U = (e, t, n) => {
 	try {
 		let r = e.get(t);
 		return r ? Date.now() - (r.at || 0) > n ? (e.delete(t), null) : r.data ?? null : null;
 	} catch {
 		return null;
 	}
-}, V = (e, t, n, r, i) => {
+}, W = (e, t, n, r, i) => {
 	try {
 		e.set(t, {
 			at: Date.now(),
 			data: n
-		}), z(e, r, i);
+		}), H(e, r, i);
 	} catch (e) {
 		console.debug?.(e);
 	}
-}, H = (e) => {
+}, G = (e) => {
 	try {
 		let t = e?.id;
 		if (t != null) return `id:${t}`;
-		let n = J(e);
+		let n = Z(e);
 		if (n) return `fp:${n}`;
 		let r = String(e?.filename || e?.name || "").trim(), i = String(e?.subfolder || "").trim(), a = String(e?.source || e?.type || "output").trim().toLowerCase();
 		if (r) return `name:${a}:${i}:${r}`;
@@ -249,7 +278,7 @@ var y = { style: {
 		console.debug?.(e);
 	}
 	return null;
-}, U = (e) => {
+}, K = (e) => {
 	try {
 		if (!e || typeof e != "object") return null;
 		let t = e?.metadata_raw;
@@ -257,7 +286,7 @@ var y = { style: {
 	} catch {
 		return null;
 	}
-}, W = (e, t) => {
+}, q = (e, t) => {
 	try {
 		if (!e || typeof e != "object" || !t || typeof t != "object") return;
 		try {
@@ -283,7 +312,7 @@ var y = { style: {
 	} catch (e) {
 		console.debug?.(e);
 	}
-}, G = (e) => {
+}, J = (e) => {
 	try {
 		if (!e || typeof e != "object") return !1;
 		if (e.geninfo && typeof e.geninfo == "object" && Object.keys(e.geninfo).length || e.prompt != null || e.workflow != null || e.metadata != null || e.exif != null) return !0;
@@ -320,36 +349,36 @@ var y = { style: {
 	} catch {
 		return !1;
 	}
-}, K = (e) => {
+}, Y = (e) => {
 	let t = typeof e == "string" ? e.trim() : "";
 	if (!t || t.includes("\n")) return !1;
 	if (/^[A-Za-z]:[\\/]/.test(t)) return !0;
 	let n = t.replace(/\\/g, "/");
 	return /(?:^|\/)[^/\n]+\.(?:png|jpe?g|webp|gif|bmp|tiff?|avif|heic|heif|apng|hdr|svg|mp4|webm|mov|mkv|avi|m4v|mp3|wav|flac|ogg)$/i.test(n);
-}, q = (e) => {
+}, X = (e) => {
 	try {
 		if (!e || typeof e != "object") return !1;
 		if (e.geninfo && typeof e.geninfo == "object" && Object.keys(e.geninfo).length) return !0;
 		if (e.metadata_raw && typeof e.metadata_raw == "object") {
 			let t = e.metadata_raw;
-			if (t.geninfo || t.GenInfo || t.generation || t.parameters || typeof t.prompt == "string" && t.prompt.trim() && !K(t.prompt) || t.prompt && typeof t.prompt == "object") return !0;
+			if (t.geninfo || t.GenInfo || t.generation || t.parameters || typeof t.prompt == "string" && t.prompt.trim() && !Y(t.prompt) || t.prompt && typeof t.prompt == "object") return !0;
 			let n = t.raw_ffprobe?.format?.tags || t.ffprobe?.format?.tags || null;
 			if (n && typeof n == "object") {
 				let e = n.prompt || n["comfyui:prompt"] || n.comfy_prompt;
-				if (e && !K(e)) return !0;
+				if (e && !Y(e)) return !0;
 			}
 		}
-		return !!(e.prompt && typeof e.prompt == "object" || typeof e.prompt == "string" && e.prompt.trim() && !K(e.prompt));
+		return !!(e.prompt && typeof e.prompt == "object" || typeof e.prompt == "string" && e.prompt.trim() && !Y(e.prompt));
 	} catch {
 		return !1;
 	}
-}, J = (e) => {
+}, Z = (e) => {
 	let t = e?.filepath || e?.path || e?.file_info?.filepath || e?.file_info?.path || e?.filePath || null;
 	return typeof t == "string" && t.trim() || null;
-}, Y = (e) => {
+}, ne = (e) => {
 	try {
 		if (String(e?.mime || e?.mimetype || e?.type || "").toLowerCase().startsWith("video/")) return !0;
-		let t = (J(e) || String(e?.filename || e?.name || "")).split(".").pop()?.toLowerCase?.() || "";
+		let t = (Z(e) || String(e?.filename || e?.name || "")).split(".").pop()?.toLowerCase?.() || "";
 		return [
 			"mp4",
 			"webm",
@@ -362,19 +391,19 @@ var y = { style: {
 	} catch {
 		return !1;
 	}
-}, X = (e) => {
+}, Q = (e) => {
 	if (!e) return null;
 	if (typeof e == "object") return e;
 	if (typeof e != "string") return null;
 	let t = e.trim();
-	return t ? M(() => {
+	return t ? F(() => {
 		let e = JSON.parse(t);
 		return e && typeof e == "object" ? e : null;
 	}, null) : null;
-}, Z = (e) => {
+}, re = (e) => {
 	try {
-		if (!Y(e) || e?.geninfo || e?.prompt || e?.workflow || e?.metadata) return;
-		let t = X(e?.metadata_raw) || {};
+		if (!ne(e) || e?.geninfo || e?.prompt || e?.workflow || e?.metadata) return;
+		let t = Q(e?.metadata_raw) || {};
 		if (t.geninfo_status) return;
 		if (e?.geninfo_status) {
 			t.geninfo_status = e.geninfo_status, e.metadata_raw = t;
@@ -384,7 +413,7 @@ var y = { style: {
 	} catch (e) {
 		console.debug?.(e);
 	}
-}, Q = (e, t) => {
+}, ie = (e, t) => {
 	let n = t && typeof t == "object" ? t : null;
 	if (!n) return e;
 	try {
@@ -420,14 +449,14 @@ var y = { style: {
 	try {
 		if (e.metadata_raw == null) e.metadata_raw = n;
 		else {
-			let t = X(e.metadata_raw);
+			let t = Q(e.metadata_raw);
 			if (t && typeof t == "object") {
 				for (let e of [
 					"geninfo_status",
 					"workflow",
 					"prompt",
 					"geninfo"
-				]) (t[e] == null && n[e] != null || e === "prompt" && K(t[e]) && n[e] != null) && (t[e] = n[e]);
+				]) (t[e] == null && n[e] != null || e === "prompt" && Y(t[e]) && n[e] != null) && (t[e] = n[e]);
 				n.raw_ffprobe && t.raw_ffprobe == null && (t.raw_ffprobe = n.raw_ffprobe), n.ffprobe && t.ffprobe == null && (t.ffprobe = n.ffprobe), e.metadata_raw = t;
 			}
 		}
@@ -438,56 +467,56 @@ var y = { style: {
 };
 async function $(e, { getAssetMetadata: t, getFileMetadataScoped: n, metadataCache: r, signal: i } = {}) {
 	if (!e || typeof e != "object") return e;
-	let a = e?.id ?? null, o = H(e), s = e, c = o ? B(I, o, N) : null;
+	let a = e?.id ?? null, o = G(e), s = e, c = o ? U(z, o, I) : null;
 	if (c && typeof c == "object") return {
 		...e,
 		...c
 	};
-	let l = o ? B(L, o, P) : null;
+	let l = o ? U(B, o, L) : null;
 	if (l) {
 		try {
-			W(s, l);
+			q(s, l);
 		} catch (e) {
 			console.debug?.(e);
 		}
 		return s;
 	}
-	if (o && R.has(o)) try {
-		let e = R.get(o);
+	if (o && V.has(o)) try {
+		let e = V.get(o);
 		if (e && typeof e.then == "function") return await e;
 	} catch (e) {
 		console.debug?.(e);
 	}
 	let u = async () => {
-		let c = a == null ? null : M(() => r?.getCached?.(a)?.data || null, null);
+		let c = a == null ? null : F(() => r?.getCached?.(a)?.data || null, null);
 		c && typeof c == "object" && (s = {
 			...e,
 			...c
 		});
 		let l = !!(s?.has_generation_data || s?.has_workflow || s?.has_generation || s?.has_generation_info), u = !!(s?.geninfo || s?.prompt || s?.workflow || s?.metadata), d = null;
-		if (a != null && (!q(s) || l && !u)) {
-			let e = await M(() => t?.(a, i ? { signal: i } : {}), null);
+		if (a != null && (!X(s) || l && !u)) {
+			let e = await F(() => t?.(a, i ? { signal: i } : {}), null);
 			e?.ok && e.data && typeof e.data == "object" ? (s = {
 				...s,
 				...e.data
-			}, M(() => r?.setCached?.(a, e.data))) : e && e?.code !== "ABORTED" && (d = {
+			}, F(() => r?.setCached?.(a, e.data))) : e && e?.code !== "ABORTED" && (d = {
 				kind: "fetch_error",
 				stage: "asset",
 				code: e?.code || "FETCH_ERROR",
 				message: e?.error || "Failed to load asset metadata"
 			});
 		}
-		if (!q(s)) try {
+		if (!X(s)) try {
 			let e = String(s?.source || s?.type || "output").trim().toLowerCase() || "output", t = String(s?.filename || s?.name || s?.file_info?.filename || "").trim(), r = String(s?.subfolder || s?.file_info?.subfolder || "").trim(), a = String(s?.root_id || s?.rootId || s?.file_info?.root_id || "").trim(), o = String(s?.filepath || s?.path || s?.file_info?.filepath || "").trim();
 			if (t) {
-				let c = await M(() => n?.({
+				let c = await F(() => n?.({
 					type: e,
 					filename: t,
 					subfolder: r,
 					root_id: a,
 					filepath: o
 				}, i ? { signal: i } : {}), null);
-				c?.ok && c.data ? s = Q({ ...s }, c.data) : c && c?.code !== "ABORTED" && (d = {
+				c?.ok && c.data ? s = ie({ ...s }, c.data) : c && c?.code !== "ABORTED" && (d = {
 					kind: "fetch_error",
 					stage: "file_scoped",
 					code: c?.code || "FETCH_ERROR",
@@ -497,16 +526,16 @@ async function $(e, { getAssetMetadata: t, getFileMetadataScoped: n, metadataCac
 		} catch (e) {
 			console.debug?.(e);
 		}
-		if (Z(s), !G(s) && d) {
-			let e = U(s);
-			e && e.kind === "media_pipeline" || W(s, d);
+		if (re(s), !J(s) && d) {
+			let e = K(s);
+			e && e.kind === "media_pipeline" || q(s, d);
 		}
-		return q(s) && o ? V(I, o, s, N, F) : d && o && V(L, o, d, P, F), s;
+		return X(s) && o ? W(z, o, s, I, R) : d && o && W(B, o, d, L, R), s;
 	};
 	if (o) {
 		let e = () => {
 			try {
-				R.delete(o);
+				V.delete(o);
 			} catch (e) {
 				console.debug?.(e);
 			}
@@ -523,19 +552,19 @@ async function $(e, { getAssetMetadata: t, getFileMetadataScoped: n, metadataCac
 				console.debug?.(e);
 			}
 			try {
-				R.delete(o);
+				V.delete(o);
 			} catch (e) {
 				console.debug?.(e);
 			}
 		});
-		return R.set(o, t), await t;
+		return V.set(o, t), await t;
 	}
 	return await u();
 }
-function ee({ title: e, asset: t, ui: n } = {}) {
+function ae({ title: e, asset: t, ui: n } = {}) {
 	let r = document.createElement("div");
 	try {
-		let { app: i } = c(A, {
+		let { app: i } = o(N, {
 			title: e,
 			asset: t,
 			loading: !!n?.loading,
@@ -570,4 +599,4 @@ function ee({ title: e, asset: t, ui: n } = {}) {
 	return i;
 }
 //#endregion
-export { j as n, $ as t };
+export { P as n, $ as t };

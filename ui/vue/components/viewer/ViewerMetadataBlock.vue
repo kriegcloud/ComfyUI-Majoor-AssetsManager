@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
+import { openAssetWorkflow } from "../../../features/workflows/openAssetWorkflow.js";
 import type { MjrAssetLike } from "../../../types/asset";
 import { t } from "../../../app/i18n.js";
 import { APP_CONFIG } from "../../../app/config.js";
@@ -14,6 +15,14 @@ const props = defineProps<{
     loading?: boolean;
     onRetry?: (() => void) | null;
 }>();
+
+const openingWorkflow = ref(false);
+async function openSavedWorkflow() {
+    if (openingWorkflow.value) return;
+    openingWorkflow.value = true;
+    try { await openAssetWorkflow(props.asset || null); }
+    finally { openingWorkflow.value = false; }
+}
 
 function getGenInfoStatus(asset: MjrAssetLike | null | undefined) {
     try {
@@ -188,6 +197,16 @@ const errorContent = computed(() => {
         >
             {{ props.title }}
         </div>
+
+        <MButton
+            v-if="props.asset"
+            type="button"
+            class="mjr-icon-btn mjr-open-workflow-btn"
+            :disabled="openingWorkflow"
+            :aria-busy="openingWorkflow"
+            :title="t('tooltip.openAssetWorkflow', 'Open this media’s saved workflow or execution settings in a new ComfyUI tab')"
+            @click="openSavedWorkflow"
+        >{{ t("btn.openAssetWorkflow", "Open workflow") }}</MButton>
 
         <div
             v-if="props.loading"
