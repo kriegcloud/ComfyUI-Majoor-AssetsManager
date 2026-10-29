@@ -1,9 +1,9 @@
-import { t as e } from "./rolldown-runtime-Dy4uBu1J.js";
-import { m as t, o as n } from "./events-DXdLblY2.js";
-import { h as r } from "./Viewer-BkYWLmB5.js";
-import { b as i, c as a, h as o, l as s, s as c, t as l } from "./SidebarWorkflowSection-DvOLlR6w.js";
-import { A as u, D as d, E as f, G as p, J as m, N as h, O as g, T as _, V as v, dt as y, ft as b, k as x, lt as S, rt as ee } from "./mjr-primevue-BOf2ACk_.js";
-//#region ui/vue/components/viewer/ViewerMetadataBlock.vue?vue&type=script&setup=true&lang.ts
+import { t as e } from "./rolldown-runtime-CGnMp29N.js";
+import { m as t, o as n } from "./events-Dilku6_C.js";
+import { h as r } from "./Viewer-Dk68L0dO.js";
+import { b as i, c as a, h as o, l as s, s as c, t as l } from "./SidebarWorkflowSection-Bh0Ctf5A.js";
+import { A as u, D as d, E as f, G as p, J as m, N as h, O as g, T as _, V as v, dt as y, ft as b, k as x, lt as S, rt as ee } from "./mjr-primevue-BRqtdXzb.js";
+// ui/vue/components/viewer/ViewerMetadataBlock.vue?vue&type=script&setup=true&lang.ts
 var C = { style: {
 	display: "flex",
 	"flex-direction": "column",
@@ -234,13 +234,7 @@ var C = { style: {
 }, I = n?.VIEWER_GENINFO_TTL_MS ?? 3e4, L = n?.VIEWER_GENINFO_ERROR_TTL_MS ?? 8e3, R = n?.VIEWER_GENINFO_MAX_ENTRIES ?? 300, z = /* @__PURE__ */ new Map(), B = /* @__PURE__ */ new Map(), V = /* @__PURE__ */ new Map(), H = (e, t, n) => {
 	try {
 		let r = Date.now();
-		for (let [n, i] of e.entries()) {
-			if (!i) {
-				e.delete(n);
-				continue;
-			}
-			r - (i.at || 0) > t && e.delete(n);
-		}
+		for (let [n, i] of e.entries()) i ? r - (i.at || 0) > t && e.delete(n) : e.delete(n);
 		if (e.size <= n) return;
 		let i = Array.from(e.entries()).sort((e, t) => (e?.[1]?.at || 0) - (t?.[1]?.at || 0)), a = e.size - n;
 		for (let t = 0; t < a; t++) {
@@ -598,5 +592,4 @@ function ae({ title: e, asset: t, ui: n } = {}) {
 	}
 	return i;
 }
-//#endregion
 export { P as n, $ as t };

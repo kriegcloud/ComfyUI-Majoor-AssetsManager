@@ -1,7 +1,7 @@
-import { A as e, E as t, R as n, X as r, Y as i, b as a, j as o, m as s } from "./events-DXdLblY2.js";
-import { a as c, n as l } from "./graphTraversal-C94Q5bJN.js";
-import { Z as u } from "./SidebarWorkflowSection-DvOLlR6w.js";
-//#region ui/features/viewer/floatingViewerProgress.ts
+import { A as e, E as t, R as n, X as r, Y as i, b as a, j as o, m as s } from "./events-Dilku6_C.js";
+import { a as c, n as l } from "./graphTraversal-DTdQWkn5.js";
+import { Z as u } from "./SidebarWorkflowSection-Bh0Ctf5A.js";
+// ui/features/viewer/floatingViewerProgress.ts
 var d = "progress-update", f = "__MJR_MFV_PROGRESS_SERVICE__";
 function p() {
 	return typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : {};
@@ -284,8 +284,7 @@ function E(e) {
 	}
 	e._progressUpdateHandler = null, e._progressCurrentNodeId = null, e._progressEl = null, e._progressNodesEl = null, e._progressStepsEl = null, e._progressTextEl = null, e._mediaProgressEl = null, e._mediaProgressTextEl = null;
 }
-//#endregion
-//#region ui/features/viewer/workflowSidebar/widgetAdapters.ts
+// ui/features/viewer/workflowSidebar/widgetAdapters.ts
 function D(e, t, n = null) {
 	switch (String(e?.type || "").toLowerCase()) {
 		case "number":
@@ -381,8 +380,7 @@ function P(e) {
 	let t = document.createElement("input");
 	return t.type = "text", t.className = "mjr-ws-input mjr-ws-readonly", t.value = e.value == null ? "" : String(e.value), t.readOnly = !0, t.tabIndex = -1, t;
 }
-//#endregion
-//#region ui/app/settings/MajoorSettingsDialog.ts
+// ui/app/settings/MajoorSettingsDialog.ts
 var F = "mjr-settings-dialog", I = "mjr-settings-dialog-style", L = "mjr:settings-dialog-visibility", R = null, z = {
 	Cards: {
 		icon: "pi pi-th-large",
@@ -767,8 +765,7 @@ function Z(e = o()) {
 	}
 	return setTimeout(() => R?.search?.focus?.(), 0), !0;
 }
-//#endregion
-//#region ui/app/openMajoorSettings.ts
+// ui/app/openMajoorSettings.ts
 function Q(e = o()) {
 	return Z(e);
 }
@@ -777,5 +774,4 @@ try {
 } catch (e) {
 	console.debug?.(e);
 }
-//#endregion
 export { T as a, y as c, O as i, v as l, L as n, w as o, D as r, E as s, Q as t };

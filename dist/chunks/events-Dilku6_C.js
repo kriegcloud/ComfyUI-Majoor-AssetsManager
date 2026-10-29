@@ -1,5 +1,5 @@
-import { a as e, n as t, s as n } from "./graphTraversal-C94Q5bJN.js";
-//#region ui/utils/ids.ts
+import { a as e, n as t, s as n } from "./graphTraversal-DTdQWkn5.js";
+// ui/utils/ids.ts
 function r(e) {
 	try {
 		return String(e ?? "").trim();
@@ -50,8 +50,7 @@ function u(e) {
 		return "";
 	}
 }
-//#endregion
-//#region ui/utils/path.ts
+// ui/utils/path.ts
 function d(e) {
 	return String(e || "").replace(/\\/g, "/");
 }
@@ -73,8 +72,7 @@ function f(e) {
 function p(e) {
 	return /^[a-zA-Z]:\//.test(String(e || ""));
 }
-//#endregion
-//#region ui/api/endpoints.ts
+// ui/api/endpoints.ts
 var m = 200, h = 0, g = {
 	HEALTH: "/mjr/am/health",
 	HEALTH_COUNTERS: "/mjr/am/health/counters",
@@ -106,6 +104,7 @@ var m = 200, h = 0, g = {
 	COLLECT_FILES: "/mjr/am/collect-files",
 	TOOLS_STATUS: "/mjr/am/tools/status",
 	SETTINGS_OUTPUT_DIRECTORY: "/mjr/am/settings/output-directory",
+	SETTINGS_INPUT_DIRECTORY: "/mjr/am/settings/input-directory",
 	SETTINGS_INDEX_DIRECTORY: "/mjr/am/settings/index-directory",
 	SETTINGS_WORKFLOW_ROOTS: "/mjr/am/settings/workflow-roots",
 	SETTINGS_METADATA_FALLBACK: "/mjr/am/settings/metadata-fallback",
@@ -335,8 +334,7 @@ function se(e, t = "") {
 function ce(e) {
 	return e ? `${g.DOWNLOAD_CLEAN}?filepath=${encodeURIComponent(e)}` : "";
 }
-//#endregion
-//#region ui/app/comfyApiBridge.ts
+// ui/app/comfyApiBridge.ts
 var E = null, D = null, le = 50;
 function O(e) {
 	return !!e && typeof e == "object";
@@ -581,8 +579,7 @@ async function Oe({ app: e = null, timeoutMs: t = 4e3, intervalMs: n = le, warnO
 	if (r && Ee("waitForComfyApi", o), i) throw Error(`waitForComfyApi timeout after ${o}ms`);
 	return null;
 }
-//#endregion
-//#region ui/app/hostAdapter.ts
+// ui/app/hostAdapter.ts
 var F = null, I = Symbol.for("mjr.host.queuePromptBinding"), ke = [
 	"selectionchange",
 	"selection-change",
@@ -1163,8 +1160,7 @@ function yt() {
 		return console.debug?.(e), null;
 	}
 }
-//#endregion
-//#region ui/app/settings/SettingsStore.ts
+// ui/app/settings/SettingsStore.ts
 var H = /* @__PURE__ */ new Map(), U = !1, W = null;
 function bt() {
 	try {
@@ -2936,7 +2932,7 @@ function Mt() {
 	});
 }
 function Nt() {
-	return Z ? Promise.resolve() : (At ||= import("./i18n.generated-DMwEk0Tb.js").then(({ GENERATED_TRANSLATIONS: e }) => {
+	return Z ? Promise.resolve() : (At ||= import("./i18n.generated-DqByySOH.js").then(({ GENERATED_TRANSLATIONS: e }) => {
 		jt(e);
 	}).catch((e) => {
 		console.warn("[Majoor i18n] Failed to load generated translations:", e), Mt();
@@ -3280,5 +3276,4 @@ var Vt = (e) => {
 	OPEN_NODE_CONTEXT: "mjr:open-node-context",
 	OPEN_MESSAGE_HISTORY: "mjr:open-message-history"
 });
-//#endregion
 export { ue as $, L as A, lt as B, pt as C, l as Ct, Me as D, qe as E, ct as F, Fe as G, V as H, Ke as I, Ae as J, ut as K, dt as L, tt as M, Ne as N, Je as O, st as P, de as Q, rt as R, He as S, s as St, yt as T, Re as U, ft as V, ze as W, Ge as X, Ve as Y, M as Z, Ie as _, se as _t, Zt as a, ee as at, mt as b, d as bt, Wt as c, S as ct, Ht as d, re as dt, Oe as et, $ as f, ne as ft, Le as g, ae as gt, G as h, ie as ht, Qt as i, C as it, Be as j, je as k, Gt as l, w as lt, Kt as m, v as mt, Xt as n, g as nt, Jt as o, ce as ot, Ut as p, y as pt, Pe as q, $t as r, _ as rt, qt as s, x as st, Yt as t, De as tt, Vt as u, b as ut, it as v, oe as vt, nt as w, u as wt, ot as x, o as xt, vt as y, T as yt, We as z };
