@@ -332,6 +332,50 @@ export function installGridKeyboard({
         return 1;
     };
 
+    /**
+     * Justified rows hold different numbers of cards, so "index ± columns" is
+     * wrong there. Pick the rendered card in the adjacent row whose centre is
+     * horizontally closest. Returns "" when not applicable (plain grid layout,
+     * or the neighbour row is not rendered) so the caller falls back.
+     */
+    const findVerticalNeighborId = (currentId: string, direction: 1 | -1): string => {
+        try {
+            if (String(gridContainer?.dataset?.mjrLayout || "") !== "justified") return "";
+            const cards = getRenderedCards();
+            const current = cards.find(
+                (card: any) => String(card?._mjrAsset?.id || "") === currentId,
+            );
+            if (!current) return "";
+            const rect = current.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            let rowTop: number | null = null;
+            let best = "";
+            let bestDistance = Infinity;
+            const measured = cards
+                .map((card: any) => ({ card, r: card.getBoundingClientRect() }))
+                .filter(({ r }: any) =>
+                    direction > 0 ? r.top >= rect.bottom - 2 : r.bottom <= rect.top + 2,
+                );
+            for (const { r } of measured) {
+                const top = Math.round(r.top);
+                if (rowTop == null || (direction > 0 ? top < rowTop : top > rowTop)) rowTop = top;
+            }
+            if (rowTop == null) return "";
+            for (const { card, r } of measured) {
+                if (Math.abs(Math.round(r.top) - rowTop) > 4) continue;
+                const distance = Math.abs(r.left + r.width / 2 - centerX);
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    best = String(card?._mjrAsset?.id || "");
+                }
+            }
+            return best;
+        } catch (e: any) {
+            console.debug?.(e);
+            return "";
+        }
+    };
+
     const selectByIds = (ids: any, activeId: any) => {
         const list = Array.isArray(ids) ? ids.map(String).filter(Boolean) : [];
         const active = String(activeId || list[0] || "");
@@ -395,8 +439,16 @@ export function installGridKeyboard({
         let nextIndex = currentIndex;
         if (key === "ArrowLeft") nextIndex -= 1;
         else if (key === "ArrowRight") nextIndex += 1;
-        else if (key === "ArrowUp") nextIndex -= cols;
-        else if (key === "ArrowDown") nextIndex += cols;
+        else if (key === "ArrowUp" || key === "ArrowDown") {
+            const verticalId = hadSelection
+                ? findVerticalNeighborId(currentId, key === "ArrowDown" ? 1 : -1)
+                : "";
+            const verticalIndex = verticalId
+                ? assets.findIndex((a: any) => String(a?.id || "") === verticalId)
+                : -1;
+            if (verticalIndex >= 0) nextIndex = verticalIndex;
+            else nextIndex += key === "ArrowDown" ? cols : -cols;
+        }
         else if (key === "Home") nextIndex = 0;
         else if (key === "End") nextIndex = assets.length - 1;
 

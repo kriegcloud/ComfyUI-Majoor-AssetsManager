@@ -1,5 +1,5 @@
 import { $t as e, A as t, At as n, Bn as r, Ct as i, Dt as a, Et as o, Ft as s, G as c, Gt as l, H as u, Hn as d, J as f, K as p, Ln as m, Mn as h, Mt as g, Nt as _, Ot as v, Pt as y, Q as b, R as x, Sn as S, St as C, Tt as ee, U as te, Ut as w, V as T, Vt as E, W as ne, Wt as D, X as O, Xn as re, Y as ie, Z as k, _t as ae, a as A, an as j, bn as oe, bt as se, en as ce, et as le, fr as ue, gn as de, gt as fe, hr as pe, ht as me, in as he, kn as ge, mt as _e, nn as ve, nt as ye, o as be, on as xe, pr as Se, q as Ce, qt as we, rn as Te, rt as Ee, sr as De, tn as Oe, tt as ke, vn as Ae, vt as je, wn as Me, wt as Ne, xt as Pe, yt as Fe } from "./client-CpKyshuF.js";
-import { n as M, t as N } from "./config-BFDzOF1N.js";
+import { n as M, t as N } from "./config-BFcjiyrf.js";
 // ui/utils/events.ts
 function Ie(e, t, { target: n = null, warnPrefix: r = "[Majoor]" } = {}) {
 	let i = n || (typeof window < "u" ? window : null);
@@ -515,6 +515,7 @@ var P = (e, t) => {
 		minSize: M.GRID_MIN_SIZE,
 		minSizePreset: Ge(M.GRID_MIN_SIZE),
 		gap: M.GRID_GAP,
+		layout: M.GRID_LAYOUT,
 		showExtBadge: M.GRID_SHOW_BADGES_EXTENSION,
 		showRatingBadge: M.GRID_SHOW_BADGES_RATING,
 		showTagsBadge: M.GRID_SHOW_BADGES_TAGS,
@@ -702,7 +703,7 @@ var P = (e, t) => {
 	}
 }, B = (e) => {
 	let t = Number(M.MAX_PAGE_SIZE) || 2e3, n = Math.max(50, Math.min(t, Number(e.grid?.pageSize) || M.DEFAULT_PAGE_SIZE));
-	N.DEFAULT_PAGE_SIZE = n, N.AUTO_SCAN_ON_STARTUP = !!e.autoScan?.onStartup, N.EXECUTION_GROUPING_ENABLED = !!(e.executionGrouping?.enabled ?? M.EXECUTION_GROUPING_ENABLED), N.STATUS_POLL_INTERVAL = Math.max(1e3, Number(e.status?.pollInterval) || M.STATUS_POLL_INTERVAL), N.DEBUG_SAFE_CALL = !!e.debug?.safeCall, N.DEBUG_SAFE_LISTENERS = !!e.debug?.safeListeners, N.DEBUG_VIEWER = !!e.debug?.viewer, N.GRID_MIN_SIZE = Ue(e.grid), N.FEED_GRID_MIN_SIZE = We(e.feed), N.GRID_GAP = Math.max(0, Math.min(40, Math.round(F(e.grid?.gap, M.GRID_GAP)))), N.GRID_SHOW_BADGES_EXTENSION = !!(e.grid?.showExtBadge ?? M.GRID_SHOW_BADGES_EXTENSION), N.GRID_SHOW_BADGES_RATING = !!(e.grid?.showRatingBadge ?? M.GRID_SHOW_BADGES_RATING), N.GRID_SHOW_BADGES_TAGS = !!(e.grid?.showTagsBadge ?? M.GRID_SHOW_BADGES_TAGS), N.GRID_SHOW_DETAILS = !!(e.grid?.showDetails ?? M.GRID_SHOW_DETAILS), N.GRID_SHOW_DETAILS_FILENAME = !!(e.grid?.showFilename ?? M.GRID_SHOW_DETAILS_FILENAME), N.GRID_SHOW_DETAILS_DATE = !!(e.grid?.showDate ?? M.GRID_SHOW_DETAILS_DATE), N.GRID_SHOW_DETAILS_DIMENSIONS = !!(e.grid?.showDimensions ?? M.GRID_SHOW_DETAILS_DIMENSIONS), N.GRID_SHOW_DETAILS_GENTIME = !!(e.grid?.showGenTime ?? M.GRID_SHOW_DETAILS_GENTIME), N.GRID_SHOW_HOVER_INFO = !!(e.grid?.showHoverInfo ?? M.GRID_SHOW_HOVER_INFO), N.GRID_SHOW_WORKFLOW_DOT = !!(e.grid?.showWorkflowDot ?? M.GRID_SHOW_WORKFLOW_DOT);
+	N.DEFAULT_PAGE_SIZE = n, N.AUTO_SCAN_ON_STARTUP = !!e.autoScan?.onStartup, N.EXECUTION_GROUPING_ENABLED = !!(e.executionGrouping?.enabled ?? M.EXECUTION_GROUPING_ENABLED), N.STATUS_POLL_INTERVAL = Math.max(1e3, Number(e.status?.pollInterval) || M.STATUS_POLL_INTERVAL), N.DEBUG_SAFE_CALL = !!e.debug?.safeCall, N.DEBUG_SAFE_LISTENERS = !!e.debug?.safeListeners, N.DEBUG_VIEWER = !!e.debug?.viewer, N.GRID_MIN_SIZE = Ue(e.grid), N.FEED_GRID_MIN_SIZE = We(e.feed), N.GRID_GAP = Math.max(0, Math.min(40, Math.round(F(e.grid?.gap, M.GRID_GAP)))), N.GRID_SHOW_BADGES_EXTENSION = !!(e.grid?.showExtBadge ?? M.GRID_SHOW_BADGES_EXTENSION), N.GRID_SHOW_BADGES_RATING = !!(e.grid?.showRatingBadge ?? M.GRID_SHOW_BADGES_RATING), N.GRID_SHOW_BADGES_TAGS = !!(e.grid?.showTagsBadge ?? M.GRID_SHOW_BADGES_TAGS), N.GRID_SHOW_DETAILS = !!(e.grid?.showDetails ?? M.GRID_SHOW_DETAILS), N.GRID_LAYOUT = String(e.grid?.layout || "").toLowerCase() === "justified" ? "justified" : "grid", N.GRID_SHOW_DETAILS_FILENAME = !!(e.grid?.showFilename ?? M.GRID_SHOW_DETAILS_FILENAME), N.GRID_SHOW_DETAILS_DATE = !!(e.grid?.showDate ?? M.GRID_SHOW_DETAILS_DATE), N.GRID_SHOW_DETAILS_DIMENSIONS = !!(e.grid?.showDimensions ?? M.GRID_SHOW_DETAILS_DIMENSIONS), N.GRID_SHOW_DETAILS_GENTIME = !!(e.grid?.showGenTime ?? M.GRID_SHOW_DETAILS_GENTIME), N.GRID_SHOW_HOVER_INFO = !!(e.grid?.showHoverInfo ?? M.GRID_SHOW_HOVER_INFO), N.GRID_SHOW_WORKFLOW_DOT = !!(e.grid?.showWorkflowDot ?? M.GRID_SHOW_WORKFLOW_DOT);
 	{
 		let t = String(e.grid?.workflowGroupBy ?? M.WORKFLOW_GRID_GROUP_BY).toLowerCase();
 		N.WORKFLOW_GRID_GROUP_BY = [
@@ -1034,6 +1035,18 @@ function Lt(e, t, n) {
 		onChange: (e) => {
 			let r = Math.max(60, Math.min(600, Math.round(Number(e) || 120)));
 			t.grid.minSize = r, t.grid.minSizePreset = Ge(r), z(t), B(t), n("grid.minSize");
+		}
+	}), e({
+		id: `${V}.Grid.Layout`,
+		category: i(j("setting.grid.layout.group", "Layout")),
+		name: j("setting.grid.layout.name", "Majoor: Grid Layout"),
+		tooltip: j("setting.grid.layout.desc", "Grid: equal square tiles. Justified: rows that keep each image's shape (masonry style); card size sets the row height."),
+		type: "combo",
+		defaultValue: String(t.grid?.layout || "").toLowerCase() === "justified" ? j("setting.grid.layout.justified", "Justified") : j("setting.grid.layout.grid", "Grid"),
+		options: [j("setting.grid.layout.grid", "Grid"), j("setting.grid.layout.justified", "Justified")],
+		onChange: (e) => {
+			let r = String(e || "").trim().toLowerCase(), i = r === "justified" || r === j("setting.grid.layout.justified", "Justified").toLowerCase();
+			t.grid.layout = i ? "justified" : "grid", z(t), B(t), n("grid.layout");
 		}
 	}), e({
 		id: `${V}.Grid.ShowDetails`,

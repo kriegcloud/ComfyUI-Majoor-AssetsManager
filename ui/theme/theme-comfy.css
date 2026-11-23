@@ -2502,6 +2502,14 @@
     overflow: hidden;
 }
 
+/* Justified layout: each card gets its own width and the row's thumbnail
+   height (--mjr-thumb-h), so the thumbnail matches the media's aspect ratio. */
+.mjr-assets-manager .mjr-grid--justified .mjr-asset-card .mjr-thumb,
+.mjr-assets-manager .mjr-grid--justified .mjr-folder-card .mjr-thumb {
+    aspect-ratio: auto;
+    height: var(--mjr-thumb-h, auto);
+}
+
 .mjr-assets-manager .mjr-audio-thumb,
 .mjr-bottom-feed .mjr-audio-thumb {
     position: absolute;

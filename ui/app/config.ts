@@ -13,6 +13,8 @@ export const APP_DEFAULTS = Object.freeze({
     GRID_MIN_SIZE: 150,
     FEED_GRID_MIN_SIZE: 120,
     GRID_GAP: 10,
+    /** "grid" = fixed square tiles; "justified" = rows that keep each image's aspect ratio. */
+    GRID_LAYOUT: "grid",
     GRID_SHOW_BADGES_EXTENSION: true,
     GRID_SHOW_BADGES_RATING: true,
     GRID_SHOW_BADGES_TAGS: true,

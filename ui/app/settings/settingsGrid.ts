@@ -113,6 +113,35 @@ export function registerGridSettings(safeAddSetting: (def: any) => void, setting
     });
 
     safeAddSetting({
+        id: `${SETTINGS_PREFIX}.Grid.Layout`,
+        category: cardCat(t("setting.grid.layout.group", "Layout")),
+        name: t("setting.grid.layout.name", "Majoor: Grid Layout"),
+        tooltip: t(
+            "setting.grid.layout.desc",
+            "Grid: equal square tiles. Justified: rows that keep each image's shape (masonry style); card size sets the row height.",
+        ),
+        type: "combo",
+        defaultValue:
+            String(settings.grid?.layout || "").toLowerCase() === "justified"
+                ? t("setting.grid.layout.justified", "Justified")
+                : t("setting.grid.layout.grid", "Grid"),
+        options: [
+            t("setting.grid.layout.grid", "Grid"),
+            t("setting.grid.layout.justified", "Justified"),
+        ],
+        onChange: (value: any) => {
+            const label = String(value || "").trim().toLowerCase();
+            const justified =
+                label === "justified" ||
+                label === t("setting.grid.layout.justified", "Justified").toLowerCase();
+            settings.grid.layout = justified ? "justified" : "grid";
+            saveMajoorSettings(settings);
+            applySettingsToConfig(settings);
+            notifyApplied("grid.layout");
+        },
+    });
+
+    safeAddSetting({
         id: `${SETTINGS_PREFIX}.Grid.ShowDetails`,
         category: cardCat("Show card details"),
         name: "Show metadata panel",

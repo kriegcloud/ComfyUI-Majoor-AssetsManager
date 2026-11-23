@@ -32,6 +32,7 @@ export function useGridVirtualRows({
     rows,
     columnCount,
     estimateRowHeight,
+    estimateRowSize = null,
     overscan = 8,
     enabled = true,
     measure = measureElement,
@@ -49,7 +50,13 @@ export function useGridVirtualRows({
         computed(() => ({
             count: rowCount.value,
             getScrollElement: () => unref(scrollRef) || null,
-            estimateSize: () => Math.max(1, readNumber(estimateRowHeight, 120)),
+            estimateSize: (index: number) =>
+                Math.max(
+                    1,
+                    typeof estimateRowSize === "function"
+                        ? readNumber(estimateRowSize(index), readNumber(estimateRowHeight, 120))
+                        : readNumber(estimateRowHeight, 120),
+                ),
             overscan: Math.max(0, readNumber(overscan, 8)),
             measureElement: measure,
         })),
@@ -65,6 +72,8 @@ export function useGridVirtualRows({
                     index: row.index,
                     virtual: row,
                     items: Array.isArray(source?.items) ? source.items : [],
+                    itemWidths: Array.isArray(source?.itemWidths) ? source.itemWidths : null,
+                    thumbHeight: Number(source?.thumbHeight || 0) || 0,
                     kind: String(source?.kind || "assets"),
                     title: String(source?.title || ""),
                     groupKey: String(source?.groupKey || ""),

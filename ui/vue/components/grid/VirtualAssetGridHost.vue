@@ -23,6 +23,7 @@ import { useGridState } from "../../composables/useGridState.js";
 import { useGridLoader } from "../../composables/useGridLoader.js";
 import { isGridHostVisible } from "../../composables/gridVisibility.js";
 import { buildStaticGridRows, useGridVirtualRows } from "../../grid/useGridVirtualRows.js";
+import { buildJustifiedRows } from "../../grid/justifiedRows.js";
 import { useInfiniteTrigger } from "../../grid/useInfiniteTrigger.js";
 import {
     buildDisplayAssets,
@@ -196,7 +197,14 @@ function scrollToAssetId(assetId, { align = "auto" } = {}) {
     if (index < 0) return;
 
     if (props.virtualize) {
-        const rowIndex = Math.floor(index / Math.max(1, columnCount.value));
+        let rowIndex = Math.floor(index / Math.max(1, columnCount.value));
+        if (justifiedLayout.value || workflowGroupingMode.value !== "none") {
+            const found = (displayRows.value || []).findIndex((row) =>
+                (row?.items || []).some((item) => String(item?.id || "") === id),
+            );
+            if (found < 0) return;
+            rowIndex = found;
+        }
         try {
             rowVirtualizer.value.scrollToIndex(rowIndex, { align });
         } catch (e) {
@@ -324,7 +332,7 @@ function sortWorkflowAssetsForGrouping(list, mode) {
     });
 }
 
-function buildWorkflowGroupedRows(assets, cols, mode) {
+function buildWorkflowGroupedRows(assets, chunkRows, mode) {
     const list = sortWorkflowAssetsForGrouping(assets, mode);
     const rows = [];
     if (!list.length) return rows;
@@ -349,14 +357,14 @@ function buildWorkflowGroupedRows(assets, cols, mode) {
             accent: workflowGroupAccent(label),
             items: [],
         });
-        for (let index = 0; index < members.length; index += cols) {
+        for (const chunk of chunkRows(members)) {
             rows.push({
                 kind: "assets",
                 title: "",
                 groupKey: label,
                 groupCount: members.length,
                 accent: workflowGroupAccent(label),
-                items: members.slice(index, index + cols),
+                ...chunk,
             });
         }
     }
@@ -465,7 +473,7 @@ const groupedWorkflowRows = computed(() => {
     if (!assets.length) return [];
     const mode = workflowGroupingMode.value;
     if (mode === "none") return [];
-    return buildWorkflowGroupedRows(assets, columnCount.value, mode);
+    return buildWorkflowGroupedRows(assets, chunkAssetRows, mode);
 });
 
 watch(
@@ -517,7 +525,10 @@ const displayRows = computed(() => {
     const assets = Array.isArray(renderableAssets.value) ? renderableAssets.value : [];
     if (!assets.length) return [];
     const mode = workflowGroupingMode.value;
-    if (mode === "none") return buildStaticGridRows(assets, columnCount.value);
+    if (mode === "none") {
+        if (!justifiedLayout.value) return buildStaticGridRows(assets, columnCount.value);
+        return chunkAssetRows(assets).map((row, index) => ({ index, kind: "assets", ...row }));
+    }
     const baseRows = Array.isArray(groupedWorkflowRows.value) ? groupedWorkflowRows.value : [];
     const out = [];
     for (const row of baseRows) {
@@ -778,6 +789,49 @@ const itemWidth = computed(() => {
     return Math.max(80, Math.floor((width - gapPx.value * Math.max(0, cols - 1)) / cols));
 });
 
+const gridContentWidth = computed(
+    () => Number(hostWidth.value || 0) || Number(scrollElementRef.value?.clientWidth || 0) || 0,
+);
+
+/** Justified ("masonry-style") rows: main grid only, never the bottom feed or workflow scope. */
+const justifiedLayout = computed(() => {
+    settingsVersion.value;
+    if (String(APP_CONFIG.GRID_LAYOUT || "grid") !== "justified") return false;
+    const container = gridContainerRef.value;
+    if (String(container?.dataset?.mjrBottomFeed || "").toLowerCase() === "true") return false;
+    return !isWorkflowScopeActive();
+});
+
+function chunkAssetRows(list) {
+    const assets = Array.isArray(list) ? list : [];
+    if (justifiedLayout.value && gridContentWidth.value > 0) {
+        return buildJustifiedRows(assets, {
+            containerWidth: gridContentWidth.value,
+            targetHeight: getActiveGridMinSize(),
+            gap: gapPx.value,
+        }).map((row) => ({
+            items: row.items,
+            itemWidths: row.itemWidths,
+            thumbHeight: row.thumbHeight,
+        }));
+    }
+    const cols = Math.max(1, columnCount.value);
+    const chunks = [];
+    for (let index = 0; index < assets.length; index += cols) {
+        chunks.push({ items: assets.slice(index, index + cols) });
+    }
+    return chunks;
+}
+
+function estimateRowSize(index) {
+    const row = Array.isArray(displayRows.value) ? displayRows.value[index] : null;
+    const thumbHeight = Number(row?.thumbHeight || 0);
+    if (thumbHeight > 0) {
+        return thumbHeight + (APP_CONFIG.GRID_SHOW_DETAILS ? 82 : 0) + gapPx.value;
+    }
+    return estimateRowHeight.value;
+}
+
 const estimateRowHeight = computed(() => {
     settingsVersion.value;
     const showDetails = !!APP_CONFIG.GRID_SHOW_DETAILS;
@@ -862,11 +916,31 @@ const gridVirtualRows = useGridVirtualRows({
     rows: displayRows,
     columnCount,
     estimateRowHeight,
+    estimateRowSize,
     overscan: adaptiveOverscan,
     enabled: computed(() => props.virtualize),
 });
 
 const rowCount = gridVirtualRows.rowCount;
+
+// TanStack only re-reads estimateSize after measure(); justified rows change
+// height whenever the width, card size or item set changes.
+watch(
+    () =>
+        justifiedLayout.value
+            ? `${gridContentWidth.value}|${getActiveGridMinSize()}|${(displayRows.value || [])
+                  .map((row) => Number(row?.thumbHeight || 0))
+                  .join(",")}`
+            : "grid",
+    () => {
+        try {
+            rowVirtualizer.value.measure();
+        } catch (e) {
+            console.debug?.(e);
+        }
+    },
+    { flush: "post" },
+);
 const rowVirtualizer = gridVirtualRows.virtualizer;
 const virtualRowsWithItems = gridVirtualRows.virtualRows;
 const totalSize = gridVirtualRows.totalSize;
@@ -1664,12 +1738,16 @@ function measureRow(node) {
     }
 }
 
-function cardStyle() {
-    return {
-        width: `${itemWidth.value}px`,
-        flex: `0 0 ${itemWidth.value}px`,
-        minWidth: `${itemWidth.value}px`,
+function cardStyle(row = null, index = 0) {
+    const width = Number(row?.itemWidths?.[index] || 0) || itemWidth.value;
+    const style = {
+        width: `${width}px`,
+        flex: `0 0 ${width}px`,
+        minWidth: `${width}px`,
     };
+    const thumbHeight = Number(row?.thumbHeight || 0);
+    if (thumbHeight > 0) style["--mjr-thumb-h"] = `${thumbHeight}px`;
+    return style;
 }
 
 function getVirtualRowByIndex(index) {
@@ -1856,6 +1934,8 @@ defineExpose({
     <div
         ref="gridContainerRef"
         class="mjr-grid"
+        :class="{ 'mjr-grid--justified': justifiedLayout }"
+        :data-mjr-layout="justifiedLayout ? 'justified' : 'grid'"
         tabindex="0"
         role="grid"
         style="position: relative; min-height: 100%;"
@@ -1959,7 +2039,7 @@ defineExpose({
                 </template>
                 <template v-else-if="virtualRow.items.length">
                 <template
-                    v-for="asset in virtualRow.items"
+                    v-for="(asset, assetIndex) in virtualRow.items"
                     :key="String(asset.id)"
                 >
                     <FolderCard
@@ -1967,7 +2047,7 @@ defineExpose({
                         :ref="getCardRef(asset)"
                         :asset="asset"
                         :selected="isSelected(asset)"
-                        :style="cardStyle()"
+                        :style="cardStyle(virtualRow, assetIndex)"
                         @mousedown.left="handleCardPrimaryMouseDown($event, asset)"
                         @click="handleCardClick($event, asset)"
                         @dblclick.stop="handleCardDblclick(asset)"
@@ -1981,7 +2061,7 @@ defineExpose({
                         role="button"
                         tabindex="0"
                         draggable="true"
-                        :style="cardStyle()"
+                        :style="cardStyle(virtualRow, assetIndex)"
                         :class="{
                             'is-selected': isSelected(asset),
                             'mjr-live-placeholder': isLivePlaceholderAsset(asset),
@@ -2037,7 +2117,7 @@ defineExpose({
                 </template>
                 <template
                     v-else
-                    v-for="asset in row.items"
+                    v-for="(asset, assetIndex) in row.items"
                     :key="String(asset.id)"
                 >
                     <FolderCard
@@ -2045,7 +2125,7 @@ defineExpose({
                         :ref="getCardRef(asset)"
                         :asset="asset"
                         :selected="isSelected(asset)"
-                        :style="cardStyle()"
+                        :style="cardStyle(row, assetIndex)"
                         @mousedown.left="handleCardPrimaryMouseDown($event, asset)"
                         @click="handleCardClick($event, asset)"
                         @dblclick.stop="handleCardDblclick(asset)"
@@ -2059,7 +2139,7 @@ defineExpose({
                         role="button"
                         tabindex="0"
                         draggable="true"
-                        :style="cardStyle()"
+                        :style="cardStyle(row, assetIndex)"
                         :class="{
                             'is-selected': isSelected(asset),
                             'mjr-live-placeholder': isLivePlaceholderAsset(asset),

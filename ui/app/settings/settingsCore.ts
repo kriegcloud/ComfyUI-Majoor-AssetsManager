@@ -38,6 +38,7 @@ export const DEFAULT_SETTINGS = {
         minSize: APP_DEFAULTS.GRID_MIN_SIZE,
         minSizePreset: detectGridSizePreset(APP_DEFAULTS.GRID_MIN_SIZE),
         gap: APP_DEFAULTS.GRID_GAP,
+        layout: APP_DEFAULTS.GRID_LAYOUT,
         showExtBadge: APP_DEFAULTS.GRID_SHOW_BADGES_EXTENSION,
         showRatingBadge: APP_DEFAULTS.GRID_SHOW_BADGES_RATING,
         showTagsBadge: APP_DEFAULTS.GRID_SHOW_BADGES_TAGS,
@@ -363,6 +364,8 @@ export const applySettingsToConfig = (settings: Record<string, any>): void => {
         settings.grid?.showTagsBadge ?? APP_DEFAULTS.GRID_SHOW_BADGES_TAGS
     );
     APP_CONFIG.GRID_SHOW_DETAILS = !!(settings.grid?.showDetails ?? APP_DEFAULTS.GRID_SHOW_DETAILS);
+    APP_CONFIG.GRID_LAYOUT =
+        String(settings.grid?.layout || "").toLowerCase() === "justified" ? "justified" : "grid";
     APP_CONFIG.GRID_SHOW_DETAILS_FILENAME = !!(
         settings.grid?.showFilename ?? APP_DEFAULTS.GRID_SHOW_DETAILS_FILENAME
     );
