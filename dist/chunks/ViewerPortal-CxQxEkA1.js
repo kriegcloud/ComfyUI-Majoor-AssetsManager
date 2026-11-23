@@ -1498,7 +1498,7 @@ var ze = {
 			if (e && !tt.value) {
 				tt.value = !0;
 				try {
-					await d(e);
+					await d(e) && $e();
 				} finally {
 					tt.value = !1;
 				}

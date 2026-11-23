@@ -329,7 +329,8 @@ async function openWorkflow() {
     if (!target || openingWorkflow.value) return;
     openingWorkflow.value = true;
     try {
-        await openAssetWorkflow(target as any);
+        // The viewer is a modal overlay; close it so the new tab is visible.
+        if (await openAssetWorkflow(target as any)) close();
     } finally {
         openingWorkflow.value = false;
     }

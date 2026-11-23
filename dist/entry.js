@@ -11757,7 +11757,7 @@ function wm() {
 var Tm = /* @__PURE__ */ ir({
 	__name: "GlobalRuntime",
 	setup(e) {
-		let t = rr(() => import("./chunks/ViewerPortal-DGj70n-0.js")), n = Q(!1), r = [
+		let t = rr(() => import("./chunks/ViewerPortal-CxQxEkA1.js")), n = Q(!1), r = [
 			B.OPEN_VIEWER,
 			B.MFV_OPEN,
 			B.MFV_TOGGLE,
