@@ -3145,16 +3145,17 @@ async function qn(e) {
 		t = Kn(n.data);
 	}
 	if (t) return t;
-	let n = e.filepath || e.path || e.full_path || e.file_info?.filepath, r = new URLSearchParams({ workflow_only: "1" });
-	if (n) r.set("path", String(n));
-	else if (e.filename) {
-		r.set("filename", String(e.filename)), r.set("type", String(e.type || "output")), r.set("subfolder", String(e.subfolder || ""));
-		let t = xe(e);
-		t && r.set("root_id", String(t));
-	} else return null;
-	let i = await k(`${ie.METADATA}?${r}`, { timeoutMs: 3e4 });
-	if (!i?.ok) throw Error("metadata");
-	return Kn(i.data);
+	let n = String(e.filepath || e.path || e.full_path || e.file_info?.filepath || ""), r = String(e.filename || n.split(/[\\/]/).pop() || "");
+	if (!r) return null;
+	let i = xe(e), a = String(e.type || (i || n ? "custom" : "output")).toLowerCase(), o = new URLSearchParams({
+		workflow_only: "1",
+		filename: r,
+		type: a
+	});
+	a === "custom" && n ? o.set("filepath", n) : (o.set("subfolder", String(e.subfolder || "")), i && o.set("root_id", String(i)));
+	let s = await k(`${ie.METADATA}?${o}`, { timeoutMs: 3e4 });
+	if (!s?.ok) throw Error("metadata");
+	return Kn(s.data);
 }
 async function Jn(e) {
 	if (!e) return !1;

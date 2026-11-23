@@ -1,6 +1,6 @@
 import { C as e, Gt as t, Lt as n, O as r, Rt as i, Sn as a, T as o, Xn as s, an as c, c as l, ct as u, f as d, fn as f, fr as p, h as m, m as h, mr as g, pr as _, r as v, un as y, v as b, w as x, y as S } from "./client-CpKyshuF.js";
-import { t as C } from "./floatingViewerManager-BmjWYMsw.js";
-import { F as ee, M as te, c as w, d as T, g as E, j as ne, l as D, n as re, o as O, s as k, t as ie, u as A, v as ae, y as j } from "./minimap-Chxv025o.js";
+import { t as C } from "./floatingViewerManager-CKQVW5Bp.js";
+import { F as ee, M as te, c as w, d as T, g as E, j as ne, l as D, n as re, o as O, s as k, t as ie, u as A, v as ae, y as j } from "./minimap-xkykW8ul.js";
 import { n as M, t as N } from "./events-1iwo5blr.js";
 import { $ as oe, B as se, C as P, D as ce, E as F, H as le, J as ue, K as I, M as L, O as R, P as z, Q as B, S as de, T as V, V as fe, W as H, X as U, b as pe, gt as W, ht as G, j as me, k as K, mt as he, ot as ge, pt as q, st as J, y as _e } from "./mjr-primevue-C07IsEdU.js";
 import { n as ve, r as ye } from "./mjr-vue-vendor-CEDOnn2t.js";
@@ -1388,7 +1388,7 @@ var xn = {
 	setup(e) {
 		let n = e, r = J(0), i = J(!1), o = null;
 		function l() {
-			return o ||= import("./floatingViewerManager-BmjWYMsw.js").then((e) => e.n), o;
+			return o ||= import("./floatingViewerManager-CKQVW5Bp.js").then((e) => e.n), o;
 		}
 		function d() {
 			return (Array.isArray(n.inputFile?.previewCandidates) ? n.inputFile.previewCandidates : [])[r.value] || "";

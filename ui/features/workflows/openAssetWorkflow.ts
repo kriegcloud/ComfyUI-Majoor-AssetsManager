@@ -65,16 +65,24 @@ async function readAssetGraph(asset: RecordData): Promise<SavedGraph | null> {
     }
     if (saved) return saved;
 
-    const path = asset.filepath || asset.path || asset.full_path || asset.file_info?.filepath;
-    const query = new URLSearchParams({ workflow_only: "1" });
-    if (path) query.set("path", String(path));
-    else if (asset.filename) {
-        query.set("filename", String(asset.filename));
-        query.set("type", String(asset.type || "output"));
+    // /mjr/am/metadata always needs `filename` and resolves it from `type`:
+    // output/input resolve `subfolder`; custom files with a known full path send
+    // it as `filepath`, otherwise `root_id` + `subfolder`.
+    const path = String(
+        asset.filepath || asset.path || asset.full_path || asset.file_info?.filepath || "",
+    );
+    const filename = String(asset.filename || path.split(/[\\/]/).pop() || "");
+    if (!filename) return null;
+    const rootId = pickRootId(asset);
+    const type = String(asset.type || (rootId || path ? "custom" : "output")).toLowerCase();
+    const query = new URLSearchParams({ workflow_only: "1", filename, type });
+    if (type === "custom" && path) {
+        // A full path is unambiguous; root_id would make the server ignore it.
+        query.set("filepath", path);
+    } else {
         query.set("subfolder", String(asset.subfolder || ""));
-        const rootId = pickRootId(asset);
         if (rootId) query.set("root_id", String(rootId));
-    } else return null;
+    }
 
     // Also covers unindexed browser assets and video container metadata.
     const result = await get(`${ENDPOINTS.METADATA}?${query}`, { timeoutMs: 30_000 });

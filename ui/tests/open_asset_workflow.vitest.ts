@@ -39,9 +39,36 @@ describe("open media workflow", () => {
         mocks.get.mockResolvedValue({ ok: true, data: { workflow } });
         await openAssetWorkflow({ filepath: "/outputs/a & b/clip.mp4" });
         const query = new URL(mocks.get.mock.calls[0][0], "http://localhost").searchParams;
-        expect(query.get("path")).toBe("/outputs/a & b/clip.mp4");
+        // The metadata route rejects requests without `filename`.
+        expect(query.get("filename")).toBe("clip.mp4");
+        expect(query.get("type")).toBe("custom");
+        expect(query.get("filepath")).toBe("/outputs/a & b/clip.mp4");
+        expect(query.has("path")).toBe(false);
         expect(query.get("workflow_only")).toBe("1");
         expect(mocks.load).toHaveBeenCalledWith(workflow, "clip.mp4", "workflow");
+    });
+
+    it("locates unindexed pinned-folder files by absolute path, not root id", async () => {
+        mocks.get.mockResolvedValue({ ok: true, data: { workflow } });
+        await openAssetWorkflow({
+            filename: "a.png",
+            type: "custom",
+            root_id: "r1",
+            filepath: "/media/refs/T2I/a.png",
+        });
+        const query = new URL(mocks.get.mock.calls[0][0], "http://localhost").searchParams;
+        expect(query.get("filename")).toBe("a.png");
+        expect(query.get("filepath")).toBe("/media/refs/T2I/a.png");
+        expect(query.has("root_id")).toBe(false);
+        expect(mocks.load).toHaveBeenCalledWith(workflow, "a.png", "workflow");
+    });
+
+    it("sends filename and output type for plain output files", async () => {
+        await openAssetWorkflow({ filename: "b.png", subfolder: "x" });
+        const query = new URL(mocks.get.mock.calls[0][0], "http://localhost").searchParams;
+        expect(query.get("filename")).toBe("b.png");
+        expect(query.get("type")).toBe("output");
+        expect(query.get("subfolder")).toBe("x");
     });
 
     it("retains root scope when locating a file by name", async () => {
