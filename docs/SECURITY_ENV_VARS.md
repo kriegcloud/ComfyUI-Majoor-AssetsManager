@@ -1,6 +1,6 @@
 # Majoor Assets Manager - Security Model & Environment Variables Guide
 
-**Version**: 2.4.9
+**Version**: 2.5.4
 **Last Updated**: April 7, 2026
 
 ## Overview
@@ -110,6 +110,7 @@ Safe Mode adds an explicit opt-in layer for operations that modify files or user
   - Allows rating/tags writes while Safe Mode is enabled.
 - `MAJOOR_ALLOW_DELETE=1`
   - Enables asset deletion (disabled by default).
+  - Also gates emptying the freedesktop trash (`POST /mjr/am/trash/empty`), which permanently removes trashed files.
 - `MAJOOR_ALLOW_RENAME=1`
   - Enables asset rename (disabled by default).
 - `MAJOOR_ALLOW_OPEN_IN_FOLDER=1`
@@ -159,6 +160,14 @@ Rate limiting is implemented on expensive endpoints:
 - Client identity based on IP address
 - Configurable thresholds for different operations
 - Resets after specified time intervals
+
+#### Tunable Write Limits
+Two write-path limits are adjustable via environment variables (requests per 60-second window, clamped to 1–10000, invalid values fall back to the default with a warning log):
+
+- `MJR_AM_DELETE_RATE_LIMIT`: single-asset delete (`POST /mjr/am/asset/delete`), default `20`
+- `MJR_AM_ASSET_WRITE_RATE_LIMIT`: rating and tag writes (`POST /mjr/am/asset/rating`, `POST /mjr/am/asset/tags`), default `30`
+
+The UI's multi-card delete and rating hotkeys send one request per card, so a selection larger than the cap fails partway with `RATE_LIMITED`. Raising these limits makes sense for bulk curation on a trusted instance (for example `MJR_AM_DELETE_RATE_LIMIT=600`). Other limits (rename, batch delete) are not affected by these variables.
 
 #### Trusted Proxy Support
 - `X-Forwarded-For` header honored only from trusted proxies
@@ -459,6 +468,14 @@ Environment variables provide secure configuration without code changes:
   - Security Impact: Controls external package installation
   - Options: `1`, `true`, `yes`, `on` to disable
   - Example: `MJR_AM_NO_AUTO_PIP=1`
+
+### API Compatibility
+- **MJR_AM_LEGACY_API_V2_ASSETS**
+  - Purpose: Also serve the deprecated `/api/v2/assets/*` alias of `/mjr/am/compat/assets/*`
+  - Default: Disabled (the `/api` namespace belongs to ComfyUI core)
+  - Security Impact: The alias sits behind the same auth/CSRF middlewares as `/mjr/am/*`
+  - Options: `1`, `true`, `yes`, `on` to enable
+  - Example: `MJR_AM_LEGACY_API_V2_ASSETS=1`
 
 ## Security Testing
 

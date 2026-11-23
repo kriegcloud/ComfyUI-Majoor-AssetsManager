@@ -4,6 +4,7 @@ import { comfyToast } from "../../../app/toast.js";
 import { t } from "../../../app/i18n.js";
 import { getHotkeysState, isHotkeysSuspended, setRatingHotkeysActive } from "./hotkeysState.js";
 import { getSelectedIdSet } from "../../grid/GridSelectionManager.js";
+import { rateAssetsInBulk } from "../../grid/bulkRating.js";
 
 const EVENT_NAME = ASSET_RATING_CHANGED_EVENT;
 
@@ -152,9 +153,8 @@ export function createRatingHotkeysController({ gridContainer, createRatingBadge
 
             if (k !== "0" && k !== "1" && k !== "2" && k !== "3" && k !== "4" && k !== "5") return;
 
-            // Check if viewer is open - let it handle rating keys
-            const viewerOverlay = document.querySelector(".mjr-viewer-overlay");
-            if (viewerOverlay && (viewerOverlay as HTMLElement).style.display !== "none") return;
+            // Check if the viewer is open - let it handle rating keys
+            if (document.querySelector(".mjr-studio")) return;
 
             // Check if the event target is within our grid container or if the grid container itself has focus/hover
             // This ensures rating hotkeys only work when interacting with the assets manager.
@@ -176,6 +176,13 @@ export function createRatingHotkeysController({ gridContainer, createRatingBadge
             e.preventDefault();
             e.stopPropagation();
             e.stopImmediatePropagation?.();
+
+            // Multi-card selections go through the batch route (chunked, sequential)
+            // to stay under the per-request id cap and the route's rate limit.
+            if (assetIds.length >= 2) {
+                await rateAssetsInBulk(assetIds, rating);
+                return;
+            }
 
             await runWithConcurrencyLimit(assetIds, (id: any) => applyRatingToAsset(id, rating), 5);
         };

@@ -58,12 +58,12 @@ describe("sidebarAssetBadge", () => {
     beforeEach(() => {
         vi.resetModules();
         vi.useFakeTimers();
-        globalThis.document = createDocument();
+        globalThis.document = (createDocument() as any);
         globalThis.requestAnimationFrame = (fn) => {
-            fn();
+            (fn as any)();
             return 1;
         };
-        globalThis.CSS = { escape: (value) => String(value) };
+        globalThis.CSS = ({ escape: (value) => String(value) } as any);
     });
 
     it("increments, deduplicates by asset id, and resets the sidebar badge", async () => {
@@ -77,12 +77,12 @@ describe("sidebarAssetBadge", () => {
         mod.incrementSidebarAssetBadge({ id: 2 });
 
         expect(mod.getSidebarAssetBadgeCount()).toBe(2);
-        expect(globalThis.document._tab.querySelector(":scope > .mjr-sidebar-asset-badge").textContent).toBe("2");
+        expect((globalThis.document as any)._tab.querySelector(":scope > .mjr-sidebar-asset-badge").textContent).toBe("2");
 
         mod.resetSidebarAssetBadge();
 
         expect(mod.getSidebarAssetBadgeCount()).toBe(0);
-        expect(globalThis.document._tab.querySelector(":scope > .mjr-sidebar-asset-badge")).toBeNull();
+        expect((globalThis.document as any)._tab.querySelector(":scope > .mjr-sidebar-asset-badge")).toBeNull();
     });
 
     it("does not show the badge when the sidebar asset badge setting is disabled", async () => {
@@ -94,7 +94,7 @@ describe("sidebarAssetBadge", () => {
         mod.incrementSidebarAssetBadge({ id: 1 });
 
         expect(mod.getSidebarAssetBadgeCount()).toBe(0);
-        expect(globalThis.document._tab.querySelector(":scope > .mjr-sidebar-asset-badge")).toBeNull();
+        expect((globalThis.document as any)._tab.querySelector(":scope > .mjr-sidebar-asset-badge")).toBeNull();
     });
 
     it("deduplicates indexed asset events by file identity when no asset id is available", async () => {
@@ -113,6 +113,18 @@ describe("sidebarAssetBadge", () => {
             subfolder: "renders",
             type: "output",
         });
+
+        expect(mod.getSidebarAssetBadgeCount()).toBe(1);
+    });
+
+    it("ignores temp preview assets", async () => {
+        const { APP_CONFIG } = await import("../app/config.js");
+        const mod = await import("../features/runtime/sidebarAssetBadge.js");
+        APP_CONFIG.SIDEBAR_ASSET_BADGE_ENABLED = true;
+
+        mod.configureSidebarAssetBadge({ sidebarTabId: "majoor-assets" });
+        mod.incrementSidebarAssetBadge({ id: 1, source: "temp" });
+        mod.incrementSidebarAssetBadge({ id: 2, source: "output" });
 
         expect(mod.getSidebarAssetBadgeCount()).toBe(1);
     });

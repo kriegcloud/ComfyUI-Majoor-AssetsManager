@@ -9,6 +9,7 @@ from uuid import uuid4
 from aiohttp import web
 from mjr_am_shared.runtime_env import get_env
 
+from .request_keys import REQUEST_DURATION_MS_KEY, REQUEST_ID_KEY, REQUEST_STATS_KEY
 from .shared import get_logger, request_id_var
 from .utils import env_float
 
@@ -171,7 +172,7 @@ async def request_context_middleware(request: web.Request, handler):
         return await handler(request)
 
     rid = _get_request_id(request)
-    request["mjr_request_id"] = rid
+    request[REQUEST_ID_KEY] = rid
     token = _set_request_id_context(rid)
     start = time.perf_counter()
     status: int | None = None
@@ -202,7 +203,7 @@ async def request_context_middleware(request: web.Request, handler):
         raise
     finally:
         duration_ms = (time.perf_counter() - start) * 1000.0
-        request["mjr_duration_ms"] = duration_ms
+        request[REQUEST_DURATION_MS_KEY] = duration_ms
         _reset_request_id_context(token)
         _emit_request_log(request, status=status, duration_ms=duration_ms, error=error, error_type=error_type)
 
@@ -283,14 +284,14 @@ def _sanitize_query_params(request: web.Request) -> dict[str, Any]:
 
 
 def build_request_log_fields(request: web.Request, response_status: int | None = None) -> dict[str, Any]:
-    stats = request.get("mjr_stats")
+    stats = request.get(REQUEST_STATS_KEY)
     return {
-        "request_id": request.get("mjr_request_id"),
+        "request_id": request.get(REQUEST_ID_KEY),
         "method": request.method,
         "path": request.path,
         "query": _sanitize_query_params(request),
         "status": response_status,
-        "duration_ms": request.get("mjr_duration_ms"),
+        "duration_ms": request.get(REQUEST_DURATION_MS_KEY),
         "remote": getattr(request, "remote", None),
         "stats": stats if isinstance(stats, dict) else None,
     }
@@ -335,7 +336,12 @@ def _emit_request_log_by_status(status: int | None, fields: dict[str, Any]) -> N
     dur = fields.get("duration_ms")
     dur_part = f" ({dur:.0f}ms)" if isinstance(dur, (int, float)) else ""
     msg = f"Request handled | {method} {path} -> {status}{dur_part}"
-    if status is not None and status >= 500:
+    if status == 404 and str(path).startswith("/mjr/am/download"):
+        # A missing file (deleted or moved outside Majoor) is not a plugin fault.
+        query = fields.get("query")
+        filepath = query.get("filepath") if isinstance(query, dict) else None
+        logger.info(f"{msg} | file not found: {filepath or '?'}", extra=fields)
+    elif status is not None and status >= 500:
         logger.error(msg, extra=fields)
     elif status is not None and status >= 400:
         logger.warning(msg, extra=fields)

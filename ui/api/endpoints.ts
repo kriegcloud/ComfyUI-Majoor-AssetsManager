@@ -119,6 +119,8 @@ export const ENDPOINTS = {
     // Asset operations
     ASSET_DELETE: "/mjr/am/asset/delete",
     ASSET_RENAME: "/mjr/am/asset/rename",
+    ASSETS_TAGS: "/mjr/am/assets/tags",
+    ASSETS_RATING: "/mjr/am/assets/rating",
 
     // Watcher
     WATCHER_STATUS: "/mjr/am/watcher/status",
@@ -144,6 +146,10 @@ export const ENDPOINTS = {
     DB_BACKUPS: "/mjr/am/db/backups",
     DB_BACKUP_SAVE: "/mjr/am/db/backup-save",
     DB_BACKUP_RESTORE: "/mjr/am/db/backup-restore",
+
+    // Trash (freedesktop trash entries from Majoor roots)
+    TRASH: "/mjr/am/trash",
+    TRASH_EMPTY: "/mjr/am/trash/empty",
 
     // Vector / Semantic search
     VECTOR_SEARCH: "/mjr/am/vector/search",

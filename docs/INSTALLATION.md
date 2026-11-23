@@ -1,6 +1,6 @@
 # Majoor Assets Manager - Installation Guide
 
-**Version**: 2.4.9
+**Version**: 2.5.4
 **Last Updated**: May 18, 2026
 
 ## Overview
@@ -12,7 +12,7 @@ This guide provides detailed instructions for installing and configuring the Maj
 
 ### System Requirements
 - ComfyUI installation (≥ 0.13.0 recommended)
-- Python 3.10, 3.11, or 3.12 (3.13 compatible)
+- Python 3.10 to 3.14
 - At least 500MB free disk space for the extension and dependencies
 - Administrator privileges (for installation and optional tool installations)
 

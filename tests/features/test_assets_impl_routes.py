@@ -589,6 +589,144 @@ async def test_assets_delete_bulk_paths(monkeypatch, tmp_path: Path):
 
 
 @pytest.mark.asyncio
+async def test_assets_delete_bulk_not_found_reports_missing_ids(monkeypatch, tmp_path: Path):
+    app = _app()
+
+    p = tmp_path / "1.png"
+    p.write_bytes(b"x")
+
+    db = _DummyDB()
+
+    async def _svc_ok():
+        return {"db": db}, None
+
+    async def _prefs(_svc):
+        return {}
+
+    async def _read_json_ok(_request):
+        return Result.Ok({"ids": [1, 2]})
+
+    async def _aquery_in(_sql, _col, values):
+        return Result.Ok([{"id": 1, "filepath": str(p)}])
+
+    monkeypatch.setattr(db, "aquery_in", _aquery_in)
+    monkeypatch.setattr(m, "_csrf_error", lambda _request: None)
+    monkeypatch.setattr(m, "_require_services", _svc_ok)
+    monkeypatch.setattr(m, "_resolve_security_prefs", _prefs)
+    monkeypatch.setattr(m, "_require_operation_enabled", lambda *_args, **_kwargs: Result.Ok({}))
+    monkeypatch.setattr(m, "_require_write_access", lambda _request: Result.Ok({}))
+    monkeypatch.setattr(m, "_check_rate_limit", lambda *_args, **_kwargs: (True, None))
+    monkeypatch.setattr(m, "_normalize_path", lambda v: Path(v) if v else None)
+    monkeypatch.setattr(m, "_is_path_allowed", lambda *_args, **_kwargs: True)
+    monkeypatch.setattr(m, "_is_path_allowed_custom", lambda *_args, **_kwargs: False)
+    monkeypatch.setattr(m, "_is_resolved_path_allowed", lambda _p: True)
+    monkeypatch.setattr(m, "_read_json", _read_json_ok)
+
+    req = make_mocked_request("POST", "/mjr/am/assets/delete", app=app)
+    resp = await (await app.router.resolve(req)).handler(req)
+    payload = _json(resp)
+    assert payload.get("code") == "NOT_FOUND"
+    assert payload.get("error") == "Assets not found: [2]"
+    assert payload.get("meta", {}).get("missing_ids") == [2]
+
+
+@pytest.mark.asyncio
+async def test_assets_delete_bulk_forbidden_reports_rejected_ids(monkeypatch, tmp_path: Path):
+    app = _app()
+
+    files = []
+    for i in [1, 2]:
+        p = tmp_path / f"{i}.png"
+        p.write_bytes(b"x")
+        files.append(p)
+
+    db = _DummyDB()
+
+    async def _svc_ok():
+        return {"db": db}, None
+
+    async def _prefs(_svc):
+        return {}
+
+    async def _read_json_ok(_request):
+        return Result.Ok({"ids": [1, 2]})
+
+    async def _aquery_in(_sql, _col, values):
+        return Result.Ok(
+            [{"id": 1, "filepath": str(files[0])}, {"id": 2, "filepath": str(files[1])}]
+        )
+
+    monkeypatch.setattr(db, "aquery_in", _aquery_in)
+    monkeypatch.setattr(m, "_csrf_error", lambda _request: None)
+    monkeypatch.setattr(m, "_require_services", _svc_ok)
+    monkeypatch.setattr(m, "_resolve_security_prefs", _prefs)
+    monkeypatch.setattr(m, "_require_operation_enabled", lambda *_args, **_kwargs: Result.Ok({}))
+    monkeypatch.setattr(m, "_require_write_access", lambda _request: Result.Ok({}))
+    monkeypatch.setattr(m, "_check_rate_limit", lambda *_args, **_kwargs: (True, None))
+    monkeypatch.setattr(m, "_normalize_path", lambda v: Path(v) if v else None)
+    monkeypatch.setattr(m, "_is_path_allowed", lambda p: p != files[1])
+    monkeypatch.setattr(m, "_is_path_allowed_custom", lambda *_args, **_kwargs: False)
+    monkeypatch.setattr(m, "_is_resolved_path_allowed", lambda _p: True)
+    monkeypatch.setattr(m, "_read_json", _read_json_ok)
+
+    req = make_mocked_request("POST", "/mjr/am/assets/delete", app=app)
+    resp = await (await app.router.resolve(req)).handler(req)
+    payload = _json(resp)
+    assert payload.get("code") == "FORBIDDEN"
+    assert payload.get("error") == "Path for asset ID 2 is not within allowed roots"
+    assert payload.get("meta", {}).get("rejected_ids") == [2]
+
+
+@pytest.mark.asyncio
+async def test_assets_delete_bulk_forbidden_collects_all_rejected_ids(
+    monkeypatch, tmp_path: Path
+):
+    app = _app()
+
+    files = []
+    for i in [1, 2]:
+        p = tmp_path / f"{i}.png"
+        p.write_bytes(b"x")
+        files.append(p)
+
+    db = _DummyDB()
+
+    async def _svc_ok():
+        return {"db": db}, None
+
+    async def _prefs(_svc):
+        return {}
+
+    async def _read_json_ok(_request):
+        return Result.Ok({"ids": [1, 2]})
+
+    async def _aquery_in(_sql, _col, values):
+        return Result.Ok(
+            [{"id": 1, "filepath": str(files[0])}, {"id": 2, "filepath": str(files[1])}]
+        )
+
+    monkeypatch.setattr(db, "aquery_in", _aquery_in)
+    monkeypatch.setattr(m, "_csrf_error", lambda _request: None)
+    monkeypatch.setattr(m, "_require_services", _svc_ok)
+    monkeypatch.setattr(m, "_resolve_security_prefs", _prefs)
+    monkeypatch.setattr(m, "_require_operation_enabled", lambda *_args, **_kwargs: Result.Ok({}))
+    monkeypatch.setattr(m, "_require_write_access", lambda _request: Result.Ok({}))
+    monkeypatch.setattr(m, "_check_rate_limit", lambda *_args, **_kwargs: (True, None))
+    monkeypatch.setattr(m, "_normalize_path", lambda v: Path(v) if v else None)
+    monkeypatch.setattr(m, "_is_path_allowed", lambda _p: False)
+    monkeypatch.setattr(m, "_is_path_allowed_custom", lambda *_args, **_kwargs: False)
+    monkeypatch.setattr(m, "_is_resolved_path_allowed", lambda _p: True)
+    monkeypatch.setattr(m, "_read_json", _read_json_ok)
+
+    req = make_mocked_request("POST", "/mjr/am/assets/delete", app=app)
+    resp = await (await app.router.resolve(req)).handler(req)
+    payload = _json(resp)
+    assert payload.get("code") == "FORBIDDEN"
+    assert payload.get("error") == "Path for asset ID 1 is not within allowed roots"
+    assert payload.get("meta", {}).get("rejected_ids") == [1, 2]
+
+
+@pytest.mark.asyncio
 async def test_assets_delete_writes_audit_log(monkeypatch, tmp_path: Path):
     app = _app()
     calls = []
@@ -1280,6 +1418,323 @@ async def test_asset_tags_filepath_resolve_timeout_and_db_error(monkeypatch, tmp
     assert _json(resp2).get("code") == "DB_ERROR"
 
 
+class _BulkRatingIndex:
+    def __init__(self, fail_ids=frozenset()):
+        self.calls = []
+        self.fail_ids = set(fail_ids)
+
+    async def update_asset_rating(self, asset_id, rating):
+        self.calls.append((asset_id, rating))
+        if asset_id in self.fail_ids:
+            return Result.Err("UPDATE_FAILED", "forced")
+        return Result.Ok({"asset_id": asset_id, "rating": rating})
+
+
+class _BulkRatingDB(_DummyDB):
+    def __init__(self, existing_ids=None):
+        super().__init__()
+        self.existing_ids = set(existing_ids) if existing_ids is not None else None
+        self.aquery_in_calls = []
+
+    async def aquery_in(self, _sql, _column, values):
+        self.aquery_in_calls.append(list(values))
+        existing = self.existing_ids
+        rows = [{"id": int(v), "filepath": str(Path("tmp") / f"{int(v)}.png")} for v in values]
+        if existing is not None:
+            rows = [row for row in rows if row["id"] in existing]
+        return Result.Ok(rows)
+
+
+def _patch_bulk_rating_common(monkeypatch, svc, read_json):
+    async def _prefs(_svc):
+        return {}
+
+    monkeypatch.setattr(m, "_csrf_error", lambda _request: None)
+    monkeypatch.setattr(m, "_require_services", svc)
+    monkeypatch.setattr(m, "_resolve_security_prefs", _prefs)
+    monkeypatch.setattr(m, "_require_operation_enabled", lambda *_args, **_kwargs: Result.Ok({}))
+    monkeypatch.setattr(m, "_require_write_access", lambda _request: Result.Ok({}))
+    monkeypatch.setattr(m, "_check_rate_limit", lambda *_args, **_kwargs: (True, None))
+    monkeypatch.setattr(m, "_read_json", read_json)
+
+
+@pytest.mark.asyncio
+async def test_assets_rating_bulk_success(monkeypatch):
+    app = _app()
+    idx = _BulkRatingIndex()
+    db = _BulkRatingDB()
+
+    async def _svc():
+        return {"db": db, "index": idx}, None
+
+    async def _read_json(_request):
+        return Result.Ok({"ids": [1, 2, 3], "rating": 4})
+
+    _patch_bulk_rating_common(monkeypatch, _svc, _read_json)
+
+    req = make_mocked_request("POST", "/mjr/am/assets/rating", app=app)
+    resp = await (await app.router.resolve(req)).handler(req)
+    payload = _json(resp)
+    assert payload.get("ok") is True
+    data = payload.get("data", {})
+    assert data.get("updated_ids") == [1, 2, 3]
+    assert data.get("failed") == []
+    assert data.get("rating") == 4
+    assert sorted(idx.calls) == [(1, 4), (2, 4), (3, 4)]
+
+
+@pytest.mark.asyncio
+async def test_assets_rating_bulk_clamps_rating(monkeypatch):
+    app = _app()
+    idx = _BulkRatingIndex()
+    db = _BulkRatingDB()
+
+    async def _svc():
+        return {"db": db, "index": idx}, None
+
+    async def _read_json(_request):
+        return Result.Ok({"ids": [7], "rating": 9})
+
+    _patch_bulk_rating_common(monkeypatch, _svc, _read_json)
+
+    req = make_mocked_request("POST", "/mjr/am/assets/rating", app=app)
+    resp = await (await app.router.resolve(req)).handler(req)
+    payload = _json(resp)
+    assert payload.get("ok") is True
+    assert payload.get("data", {}).get("rating") == 5
+    assert idx.calls == [(7, 5)]
+
+
+@pytest.mark.asyncio
+async def test_assets_rating_bulk_missing_id_is_partial(monkeypatch):
+    app = _app()
+    idx = _BulkRatingIndex()
+    db = _BulkRatingDB(existing_ids={1})
+
+    async def _svc():
+        return {"db": db, "index": idx}, None
+
+    async def _read_json(_request):
+        return Result.Ok({"ids": [1, 999], "rating": 2})
+
+    _patch_bulk_rating_common(monkeypatch, _svc, _read_json)
+
+    req = make_mocked_request("POST", "/mjr/am/assets/rating", app=app)
+    resp = await (await app.router.resolve(req)).handler(req)
+    payload = _json(resp)
+    assert payload.get("ok") is True
+    assert payload.get("meta", {}).get("partial") is True
+    data = payload.get("data", {})
+    assert data.get("updated_ids") == [1]
+    assert data.get("failed") == [{"id": 999, "code": "NOT_FOUND", "error": "Asset not found: 999"}]
+    assert idx.calls == [(1, 2)]
+
+
+@pytest.mark.asyncio
+async def test_assets_rating_bulk_invalid_bodies_write_nothing(monkeypatch):
+    app = _app()
+    idx = _BulkRatingIndex()
+    db = _BulkRatingDB()
+
+    async def _svc():
+        return {"db": db, "index": idx}, None
+
+    async def _read_empty(_request):
+        return Result.Ok({"ids": [], "rating": 3})
+
+    async def _read_bad_id(_request):
+        return Result.Ok({"ids": ["x"], "rating": 3})
+
+    async def _read_too_many(_request):
+        return Result.Ok({"ids": list(range(1, 502)), "rating": 3})
+
+    async def _read_missing_rating(_request):
+        return Result.Ok({"ids": [1]})
+
+    _patch_bulk_rating_common(monkeypatch, _svc, _read_empty)
+    req1 = make_mocked_request("POST", "/mjr/am/assets/rating", app=app)
+    resp1 = await (await app.router.resolve(req1)).handler(req1)
+    assert _json(resp1).get("code") == "INVALID_INPUT"
+
+    monkeypatch.setattr(m, "_read_json", _read_bad_id)
+    req2 = make_mocked_request("POST", "/mjr/am/assets/rating", app=app)
+    resp2 = await (await app.router.resolve(req2)).handler(req2)
+    assert _json(resp2).get("code") == "INVALID_INPUT"
+
+    monkeypatch.setattr(m, "_read_json", _read_too_many)
+    req3 = make_mocked_request("POST", "/mjr/am/assets/rating", app=app)
+    resp3 = await (await app.router.resolve(req3)).handler(req3)
+    assert _json(resp3).get("code") == "INVALID_INPUT"
+
+    monkeypatch.setattr(m, "_read_json", _read_missing_rating)
+    req4 = make_mocked_request("POST", "/mjr/am/assets/rating", app=app)
+    resp4 = await (await app.router.resolve(req4)).handler(req4)
+    assert _json(resp4).get("code") == "INVALID_INPUT"
+
+    assert idx.calls == []
+    assert db.aquery_in_calls == []
+
+
+@pytest.mark.asyncio
+async def test_assets_rating_bulk_rate_limit(monkeypatch):
+    app = _app()
+    captured = []
+
+    def _rate_limited(_request, endpoint, max_requests, window_seconds):
+        captured.append((endpoint, max_requests, window_seconds))
+        return (False, 9)
+
+    async def _svc():
+        return {"db": _DummyDB(), "index": _BulkRatingIndex()}, None
+
+    async def _read_json(_request):
+        return Result.Ok({"ids": [1], "rating": 3})
+
+    _patch_bulk_rating_common(monkeypatch, _svc, _read_json)
+    monkeypatch.setattr(m, "_check_rate_limit", _rate_limited)
+
+    req = make_mocked_request("POST", "/mjr/am/assets/rating", app=app)
+    resp = await (await app.router.resolve(req)).handler(req)
+    assert _json(resp).get("code") == "RATE_LIMITED"
+    assert captured == [("assets_rating", 10, 60)]
+
+
+@pytest.mark.asyncio
+async def test_assets_rating_bulk_sync_enqueued_for_updated_only(monkeypatch, tmp_path: Path):
+    app = _app()
+    worker_calls = []
+    filepaths = {1: str(tmp_path / "one.png"), 2: str(tmp_path / "two.png")}
+
+    class _SyncDB:
+        async def aquery(self, sql, params=()):
+            if "FROM assets WHERE id" in sql:
+                fp = filepaths.get(params[0] if params else None)
+                return Result.Ok([{"filepath": fp}] if fp else [])
+            return Result.Ok([{"rating": 2, "tags": "[]"}])
+
+        async def aquery_in(self, _sql, _column, values):
+            return Result.Ok([{"id": int(v)} for v in values if int(v) in filepaths])
+
+    class _Worker:
+        def enqueue(self, filepath, rating, tags, mode):
+            worker_calls.append((filepath, rating, tags, mode))
+
+    worker = _Worker()
+    idx = _BulkRatingIndex()
+
+    async def _svc():
+        return {"db": _SyncDB(), "index": idx, "rating_tags_sync": worker}, None
+
+    async def _read_json(_request):
+        return Result.Ok({"ids": [1, 2, 999], "rating": 3})
+
+    _patch_bulk_rating_common(monkeypatch, _svc, _read_json)
+
+    req = make_mocked_request(
+        "POST", "/mjr/am/assets/rating", app=app, headers={"X-MJR-RTSYNC": "on"}
+    )
+    resp = await (await app.router.resolve(req)).handler(req)
+    payload = _json(resp)
+    assert payload.get("ok") is True
+    assert payload.get("data", {}).get("updated_ids") == [1, 2]
+    assert len(worker_calls) == 2
+    assert {worker_calls[0][0], worker_calls[1][0]} == set(filepaths.values())
+    assert all(call[-1] == "on" for call in worker_calls)
+
+    worker_calls.clear()
+    req_off = make_mocked_request(
+        "POST", "/mjr/am/assets/rating", app=app, headers={"X-MJR-RTSYNC": "off"}
+    )
+    _ = await (await app.router.resolve(req_off)).handler(req_off)
+    assert worker_calls == []
+
+
+@pytest.mark.asyncio
+async def test_assets_rating_bulk_writes_audit_log(monkeypatch):
+    app = _app()
+    calls = []
+    idx = _BulkRatingIndex()
+    db = _BulkRatingDB()
+
+    async def _svc():
+        return {"db": db, "index": idx}, None
+
+    async def _read_json(_request):
+        return Result.Ok({"ids": list(range(1, 31)), "rating": 4})
+
+    async def _audit_log_write(_services, **kwargs):
+        calls.append(kwargs)
+        return True
+
+    _patch_bulk_rating_common(monkeypatch, _svc, _read_json)
+    monkeypatch.setattr(m, "audit_log_write", _audit_log_write)
+
+    req = make_mocked_request("POST", "/mjr/am/assets/rating", app=app)
+    resp = await (await app.router.resolve(req)).handler(req)
+    assert _json(resp).get("ok") is True
+    assert len(calls) == 1
+    assert calls[0]["operation"] == "assets_rating"
+    assert calls[0]["target"] == "assets:" + ",".join(str(i) for i in range(1, 26))
+    assert calls[0]["details"]["rating"] == 4
+    assert calls[0]["details"]["updated"] == 30
+    assert calls[0]["details"]["failed"] == 0
+
+
+@pytest.mark.asyncio
+async def test_assets_rating_bulk_update_failure_is_partial(monkeypatch):
+    app = _app()
+    idx = _BulkRatingIndex(fail_ids={2})
+    db = _BulkRatingDB()
+
+    async def _svc():
+        return {"db": db, "index": idx}, None
+
+    async def _read_json(_request):
+        return Result.Ok({"ids": [1, 2], "rating": 5})
+
+    _patch_bulk_rating_common(monkeypatch, _svc, _read_json)
+
+    req = make_mocked_request("POST", "/mjr/am/assets/rating", app=app)
+    resp = await (await app.router.resolve(req)).handler(req)
+    payload = _json(resp)
+    assert payload.get("ok") is True
+    assert payload.get("meta", {}).get("partial") is True
+    data = payload.get("data", {})
+    assert data.get("updated_ids") == [1]
+    assert data.get("failed") == [{"id": 2, "code": "UPDATE_FAILED", "error": "forced"}]
+
+
+@pytest.mark.asyncio
+async def test_assets_rating_bulk_real_operation_gate(monkeypatch):
+    app = _app()
+    idx = _BulkRatingIndex()
+    db = _BulkRatingDB()
+
+    async def _svc():
+        return {"db": db, "index": idx}, None
+
+    async def _read_json(_request):
+        return Result.Ok({"ids": [1, 2], "rating": 3})
+
+    _patch_bulk_rating_common(monkeypatch, _svc, _read_json)
+    # Wire the REAL operation gate (no lambda mock): safe mode + allow_write
+    # must let the batch route through the write-ops tuple.
+    import mjr_am_backend.routes.core.security as _sec
+
+    monkeypatch.setattr(m, "_require_operation_enabled", _sec._require_operation_enabled)
+
+    async def _prefs_safe_allow_write(_svc):
+        return {"safe_mode": True, "allow_write": True}
+
+    monkeypatch.setattr(m, "_resolve_security_prefs", _prefs_safe_allow_write)
+
+    req = make_mocked_request("POST", "/mjr/am/assets/rating", app=app)
+    resp = await (await app.router.resolve(req)).handler(req)
+    payload = _json(resp)
+    assert payload.get("ok") is True
+    assert payload.get("data", {}).get("updated_ids") == [1, 2]
+
+
 @pytest.mark.asyncio
 async def test_rating_tags_sync_header_modes(monkeypatch, tmp_path: Path):
     app = _app()
@@ -1333,3 +1788,486 @@ async def test_rating_tags_sync_header_modes(monkeypatch, tmp_path: Path):
     req3 = make_mocked_request("POST", "/mjr/am/asset/rating", app=app, headers={"X-MJR-RTSYNC": "both"})
     _ = await (await app.router.resolve(req3)).handler(req3)
     assert worker.calls[-1][-1] == "both"
+
+
+class _BulkTagsIndex:
+    """Fake index service capturing merge_asset_tags calls."""
+
+    def __init__(self, results=None, default_tags=None):
+        self.calls = []
+        self._results = results or {}
+        self._default_tags = list(default_tags or [])
+
+    async def merge_asset_tags(self, asset_id, add, remove):
+        self.calls.append((asset_id, list(add or []), list(remove or [])))
+        preset = self._results.get(asset_id)
+        if preset is not None:
+            return preset
+        return Result.Ok(
+            {"asset_id": asset_id, "changed": True, "tags": list(self._default_tags)}
+        )
+
+
+def _patch_bulk_tags_common(monkeypatch, index, db=None):
+    async def _svc_ok():
+        services = {"index": index}
+        if db is not None:
+            services["db"] = db
+        return services, None
+
+    async def _prefs(_svc):
+        return {}
+
+    monkeypatch.setattr(m, "_csrf_error", lambda _request: None)
+    monkeypatch.setattr(m, "_require_services", _svc_ok)
+    monkeypatch.setattr(m, "_resolve_security_prefs", _prefs)
+    monkeypatch.setattr(m, "_require_operation_enabled", lambda *_args, **_kwargs: Result.Ok({}))
+    monkeypatch.setattr(m, "_require_write_access", lambda _request: Result.Ok({}))
+    monkeypatch.setattr(m, "_check_rate_limit", lambda *_args, **_kwargs: (True, None))
+
+
+@pytest.mark.asyncio
+async def test_assets_tags_bulk_add_to_all(monkeypatch):
+    app = _app()
+    index = _BulkTagsIndex(default_tags=["b"])
+    _patch_bulk_tags_common(monkeypatch, index)
+
+    async def _read_json(_request):
+        return Result.Ok({"ids": [1, 2], "add": ["b"]})
+
+    monkeypatch.setattr(m, "_read_json", _read_json)
+
+    req = make_mocked_request("POST", "/mjr/am/assets/tags", app=app)
+    resp = await (await app.router.resolve(req)).handler(req)
+    payload = _json(resp)
+    assert payload.get("ok") is True
+    assert payload.get("data", {}).get("updated_ids") == [1, 2]
+    assert payload.get("data", {}).get("unchanged_ids") == []
+    assert payload.get("data", {}).get("failed") == []
+    assert payload.get("data", {}).get("tags") == {"1": ["b"], "2": ["b"]}
+    assert index.calls == [(1, ["b"], []), (2, ["b"], [])]
+
+
+@pytest.mark.asyncio
+async def test_assets_tags_bulk_remove_from_all(monkeypatch):
+    app = _app()
+    index = _BulkTagsIndex(default_tags=[])
+    _patch_bulk_tags_common(monkeypatch, index)
+
+    async def _read_json(_request):
+        return Result.Ok({"ids": [1, 2], "remove": ["b"]})
+
+    monkeypatch.setattr(m, "_read_json", _read_json)
+
+    req = make_mocked_request("POST", "/mjr/am/assets/tags", app=app)
+    resp = await (await app.router.resolve(req)).handler(req)
+    payload = _json(resp)
+    assert payload.get("ok") is True
+    assert payload.get("data", {}).get("updated_ids") == [1, 2]
+    assert index.calls == [(1, [], ["b"]), (2, [], ["b"])]
+
+
+@pytest.mark.asyncio
+async def test_assets_tags_bulk_add_and_remove_in_one_request(monkeypatch):
+    app = _app()
+    index = _BulkTagsIndex(default_tags=["b", "c"])
+    _patch_bulk_tags_common(monkeypatch, index)
+
+    async def _read_json(_request):
+        return Result.Ok({"ids": [1], "add": ["c"], "remove": ["a"]})
+
+    monkeypatch.setattr(m, "_read_json", _read_json)
+
+    req = make_mocked_request("POST", "/mjr/am/assets/tags", app=app)
+    resp = await (await app.router.resolve(req)).handler(req)
+    payload = _json(resp)
+    assert payload.get("ok") is True
+    assert payload.get("data", {}).get("tags") == {"1": ["b", "c"]}
+    assert index.calls == [(1, ["c"], ["a"])]
+
+
+@pytest.mark.asyncio
+async def test_assets_tags_bulk_case_insensitive_and_unchanged(monkeypatch):
+    app = _app()
+    index = _BulkTagsIndex(
+        results={
+            1: Result.Ok({"asset_id": 1, "changed": False, "tags": ["Cat"]}),
+            2: Result.Ok({"asset_id": 2, "changed": False, "tags": ["a"]}),
+        }
+    )
+    _patch_bulk_tags_common(monkeypatch, index)
+
+    async def _read_json(_request):
+        return Result.Ok({"ids": [1, 2], "add": [" Cat ", "cat"], "remove": ["z"]})
+
+    monkeypatch.setattr(m, "_read_json", _read_json)
+
+    req = make_mocked_request("POST", "/mjr/am/assets/tags", app=app)
+    resp = await (await app.router.resolve(req)).handler(req)
+    payload = _json(resp)
+    assert payload.get("ok") is True
+    assert payload.get("data", {}).get("updated_ids") == []
+    assert payload.get("data", {}).get("unchanged_ids") == [1, 2]
+    assert payload.get("data", {}).get("tags") == {"1": ["Cat"], "2": ["a"]}
+    assert index.calls[0] == (1, ["Cat"], ["z"])
+
+
+@pytest.mark.asyncio
+async def test_assets_tags_bulk_too_many_tags_partial(monkeypatch):
+    app = _app()
+    index = _BulkTagsIndex(
+        results={
+            1: Result.Err("INVALID_INPUT", "Too many tags (max 50)"),
+            2: Result.Ok({"asset_id": 2, "changed": True, "tags": ["new"]}),
+        }
+    )
+    _patch_bulk_tags_common(monkeypatch, index)
+
+    async def _read_json(_request):
+        return Result.Ok({"ids": [1, 2], "add": ["new"]})
+
+    monkeypatch.setattr(m, "_read_json", _read_json)
+
+    req = make_mocked_request("POST", "/mjr/am/assets/tags", app=app)
+    resp = await (await app.router.resolve(req)).handler(req)
+    payload = _json(resp)
+    assert payload.get("ok") is True
+    assert payload.get("meta", {}).get("partial") is True
+    assert payload.get("data", {}).get("updated_ids") == [2]
+    assert payload.get("data", {}).get("failed") == [
+        {"id": 1, "code": "INVALID_INPUT", "error": "Too many tags (max 50)"}
+    ]
+    assert len(index.calls) == 2
+
+
+@pytest.mark.asyncio
+async def test_assets_tags_bulk_missing_id_partial(monkeypatch):
+    app = _app()
+    index = _BulkTagsIndex(
+        results={
+            1: Result.Ok({"asset_id": 1, "changed": True, "tags": ["b"]}),
+            999: Result.Err("NOT_FOUND", "Asset not found: 999"),
+        }
+    )
+    _patch_bulk_tags_common(monkeypatch, index)
+
+    async def _read_json(_request):
+        return Result.Ok({"ids": [1, 999], "add": ["b"]})
+
+    monkeypatch.setattr(m, "_read_json", _read_json)
+
+    req = make_mocked_request("POST", "/mjr/am/assets/tags", app=app)
+    resp = await (await app.router.resolve(req)).handler(req)
+    payload = _json(resp)
+    assert payload.get("ok") is True
+    assert payload.get("meta", {}).get("partial") is True
+    assert payload.get("data", {}).get("updated_ids") == [1]
+    failed = payload.get("data", {}).get("failed")
+    assert failed == [{"id": 999, "code": "NOT_FOUND", "error": "Asset not found: 999"}]
+
+
+@pytest.mark.asyncio
+async def test_assets_tags_bulk_bad_body_variants(monkeypatch):
+    app = _app()
+    index = _BulkTagsIndex()
+    _patch_bulk_tags_common(monkeypatch, index)
+
+    req = make_mocked_request("GET", "/mjr/am/routes", app=app)
+    routes_resp = await (await app.router.resolve(req)).handler(req)
+    routes_payload = _json(routes_resp)
+    assert any(
+        (r or {}).get("path") == "/mjr/am/assets/tags"
+        for r in routes_payload.get("data", {}).get("routes", [])
+    )
+
+    bodies = [
+        {"ids": [1], "add": [], "remove": []},
+        {"ids": [1], "add": ["  "], "remove": [""]},
+        {"ids": [1], "add": "b"},
+        {"ids": [], "add": ["b"]},
+        {"ids": [i for i in range(501)], "add": ["b"]},
+    ]
+    for body in bodies:
+        async def _read_json(_request, _body=body):
+            return Result.Ok(_body)
+
+        monkeypatch.setattr(m, "_read_json", _read_json)
+        req = make_mocked_request("POST", "/mjr/am/assets/tags", app=app)
+        resp = await (await app.router.resolve(req)).handler(req)
+        payload = _json(resp)
+        assert payload.get("ok") is False, body
+        assert payload.get("code") == "INVALID_INPUT", body
+    assert index.calls == []
+
+
+@pytest.mark.asyncio
+async def test_assets_tags_bulk_rate_limited(monkeypatch):
+    app = _app()
+    index = _BulkTagsIndex()
+    _patch_bulk_tags_common(monkeypatch, index)
+    monkeypatch.setattr(m, "_check_rate_limit", lambda *_args, **_kwargs: (False, 9))
+
+    async def _read_json(_request):
+        return Result.Ok({"ids": [1], "add": ["b"]})
+
+    monkeypatch.setattr(m, "_read_json", _read_json)
+
+    req = make_mocked_request("POST", "/mjr/am/assets/tags", app=app)
+    resp = await (await app.router.resolve(req)).handler(req)
+    payload = _json(resp)
+    assert payload.get("code") == "RATE_LIMITED"
+    assert index.calls == []
+
+
+@pytest.mark.asyncio
+async def test_assets_tags_bulk_sync_enqueue_for_updated_only(monkeypatch, tmp_path: Path):
+    app = _app()
+    f = tmp_path / "sync.png"
+    f.write_bytes(b"x")
+
+    index = _BulkTagsIndex(
+        results={
+            1: Result.Ok({"asset_id": 1, "changed": True, "tags": ["b"]}),
+            2: Result.Ok({"asset_id": 2, "changed": True, "tags": ["b"]}),
+            3: Result.Ok({"asset_id": 3, "changed": False, "tags": ["b"]}),
+        }
+    )
+
+    class _Worker:
+        def __init__(self):
+            self.calls = []
+
+        def enqueue(self, filepath, rating, tags, mode):
+            self.calls.append((filepath, rating, tags, mode))
+
+    class _SyncDB:
+        async def aquery(self, sql, _params=()):
+            if "FROM assets WHERE id" in sql:
+                return Result.Ok([{"filepath": str(f)}])
+            if "FROM asset_metadata" in sql:
+                return Result.Ok([{"rating": 3, "tags": '["b"]'}])
+            return Result.Ok([])
+
+    worker = _Worker()
+    db = _SyncDB()
+    _patch_bulk_tags_common(monkeypatch, index, db=db)
+
+    async def _svc_ok():
+        return {"index": index, "db": db, "rating_tags_sync": worker}, None
+
+    monkeypatch.setattr(m, "_require_services", _svc_ok)
+
+    async def _read_json(_request):
+        return Result.Ok({"ids": [1, 2, 3], "add": ["b"]})
+
+    monkeypatch.setattr(m, "_read_json", _read_json)
+
+    request = make_mocked_request(
+        "POST", "/mjr/am/assets/tags", app=app, headers={"X-MJR-RTSYNC": "on"}
+    )
+    resp = await (await app.router.resolve(request)).handler(request)
+    payload = _json(resp)
+    assert payload.get("ok") is True
+    assert payload.get("data", {}).get("unchanged_ids") == [3]
+    assert len(worker.calls) == 2
+    assert all(call[-1] == "on" for call in worker.calls)
+
+
+@pytest.mark.asyncio
+async def test_assets_tags_bulk_dedupes_ids(monkeypatch):
+    app = _app()
+    index = _BulkTagsIndex(default_tags=["b"])
+    _patch_bulk_tags_common(monkeypatch, index)
+
+    async def _read_json(_request):
+        return Result.Ok({"ids": [1, 1, 2], "add": ["b"]})
+
+    monkeypatch.setattr(m, "_read_json", _read_json)
+
+    req = make_mocked_request("POST", "/mjr/am/assets/tags", app=app)
+    resp = await (await app.router.resolve(req)).handler(req)
+    payload = _json(resp)
+    assert payload.get("ok") is True
+    assert index.calls == [(1, ["b"], []), (2, ["b"], [])]
+    assert payload.get("data", {}).get("updated_ids") == [1, 2]
+    assert payload.get("data", {}).get("tags") == {"1": ["b"], "2": ["b"]}
+
+
+@pytest.mark.asyncio
+async def test_assets_tags_bulk_real_gate_safe_mode_with_allow_write(monkeypatch):
+    """Wires the REAL operation gate: safe mode on + allow_write -> bulk tags allowed."""
+    app = _app()
+    index = _BulkTagsIndex(default_tags=["b"])
+
+    monkeypatch.delenv("MAJOOR_SAFE_MODE", raising=False)
+    monkeypatch.delenv("MAJOOR_ALLOW_WRITE", raising=False)
+
+    async def _svc_ok():
+        return {"index": index}, None
+
+    async def _prefs_allow_write(_svc):
+        return {"allow_write": True}
+
+    monkeypatch.setattr(m, "_csrf_error", lambda _request: None)
+    monkeypatch.setattr(m, "_require_services", _svc_ok)
+    monkeypatch.setattr(m, "_resolve_security_prefs", _prefs_allow_write)
+    monkeypatch.setattr(m, "_require_write_access", lambda _request: Result.Ok({}))
+    monkeypatch.setattr(m, "_check_rate_limit", lambda *_args, **_kwargs: (True, None))
+
+    async def _read_json(_request):
+        return Result.Ok({"ids": [1], "add": ["b"]})
+
+    monkeypatch.setattr(m, "_read_json", _read_json)
+
+    req = make_mocked_request("POST", "/mjr/am/assets/tags", app=app)
+    resp = await (await app.router.resolve(req)).handler(req)
+    payload = _json(resp)
+    assert payload.get("ok") is True
+    assert payload.get("data", {}).get("updated_ids") == [1]
+    assert index.calls == [(1, ["b"], [])]
+
+
+@pytest.mark.asyncio
+async def test_assets_tags_bulk_writes_single_audit_entry(monkeypatch):
+    app = _app()
+    calls = []
+    index = _BulkTagsIndex(
+        results={
+            1: Result.Ok({"asset_id": 1, "changed": True, "tags": ["b"]}),
+            2: Result.Err("NOT_FOUND", "Asset not found: 2"),
+        }
+    )
+    _patch_bulk_tags_common(monkeypatch, index)
+
+    async def _audit_log_write(_services, **kwargs):
+        calls.append(kwargs)
+        return True
+
+    monkeypatch.setattr(m, "audit_log_write", _audit_log_write)
+
+    async def _read_json(_request):
+        return Result.Ok({"ids": [1, 2], "add": ["b"], "remove": ["a"]})
+
+    monkeypatch.setattr(m, "_read_json", _read_json)
+
+    req = make_mocked_request("POST", "/mjr/am/assets/tags", app=app)
+    resp = await (await app.router.resolve(req)).handler(req)
+    payload = _json(resp)
+    assert payload.get("ok") is True
+    assert len(calls) == 1
+    assert calls[0]["operation"] == "assets_tags"
+    assert calls[0]["target"] == "assets:1,2"
+    details = calls[0]["details"]
+    assert details["add_count"] == 1
+    assert details["remove_count"] == 1
+    assert details["updated"] == 1
+    assert details["failed"] == 1
+
+
+async def _call_delete_route(monkeypatch, knob_value):
+    import mjr_am_backend.routes.assets.route_actions_delete as route_actions_delete
+
+    captured = {}
+
+    async def _capture_prepare(_request, **kwargs):
+        captured.update(kwargs)
+        return Result.Err("SERVICE_UNAVAILABLE", "stop")
+
+    async def _noop(*_args, **_kwargs):
+        return Result.Ok(None)
+
+    def _noop_sync(*_args, **_kwargs):
+        return Result.Ok(None)
+
+    if knob_value is not None:
+        monkeypatch.setattr(route_actions_delete, "DELETE_RATE_LIMIT_PER_MIN", knob_value)
+
+    resp = await route_actions_delete.handle_delete_asset(
+        make_mocked_request("POST", "/mjr/am/asset/delete"),
+        prepare_asset_path_context=_capture_prepare,
+        resolve_delete_target=_noop,
+        load_asset_filepath_by_id=_noop,
+        find_asset_row_by_filepath=lambda *_args, **_kwargs: None,
+        filepath_db_keys=lambda _fp: {},
+        filepath_where_clause=lambda _fp: "1=1",
+        delete_file_safe=lambda _p: Result.Ok(True),
+        audit_asset_write=_noop,
+        json_response=m._json_response,
+        require_services=_noop,
+        resolve_security_prefs=_noop,
+        require_operation_enabled=_noop_sync,
+        require_write_access=_noop_sync,
+        check_rate_limit=lambda *_args, **_kwargs: (True, None),
+        read_json=_noop,
+        csrf_error=lambda _request: None,
+        normalize_path=lambda _v: None,
+        is_path_allowed=lambda _p: True,
+        is_path_allowed_custom=lambda _p: False,
+        is_resolved_path_allowed=lambda _p: True,
+    )
+    _ = resp
+    return captured
+
+
+@pytest.mark.asyncio
+async def test_delete_route_rate_limit_wiring_default(monkeypatch):
+    captured = await _call_delete_route(monkeypatch, knob_value=None)
+    assert captured["operation"] == "asset_delete"
+    assert captured["rate_limit_endpoint"] == "asset_delete"
+    assert captured["max_requests"] == 20
+    assert captured["window_seconds"] == 60
+
+
+@pytest.mark.asyncio
+async def test_delete_route_rate_limit_wiring_uses_knob(monkeypatch):
+    captured = await _call_delete_route(monkeypatch, knob_value=600)
+    assert captured["max_requests"] == 600
+
+
+@pytest.mark.asyncio
+async def test_asset_rating_and_tags_rate_limit_wiring(monkeypatch):
+    from mjr_am_backend.features.assets.models import AssetRouteContext
+
+    captured = {}
+
+    async def _capture_prepare(_request, **kwargs):
+        captured.update(kwargs)
+        return Result.Ok(AssetRouteContext(services={}, body={}))
+
+    monkeypatch.setattr(m, "prepare_asset_route_context", _capture_prepare)
+    monkeypatch.setattr(m, "ASSET_WRITE_RATE_LIMIT_PER_MIN", 600)
+
+    req = make_mocked_request("POST", "/mjr/am/asset/rating")
+
+    res = await m._prepare_asset_op_request(req, operation="asset_rating")
+    assert res.ok
+    assert captured["operation"] == "asset_rating"
+    assert captured["rate_limit_endpoint"] == "asset_rating"
+    assert captured["max_requests"] == 600
+    assert captured["window_seconds"] == 60
+
+    res = await m._prepare_asset_op_request(req, operation="asset_tags")
+    assert res.ok
+    assert captured["operation"] == "asset_tags"
+    assert captured["rate_limit_endpoint"] == "asset_tags"
+    assert captured["max_requests"] == 600
+    assert captured["window_seconds"] == 60
+
+
+@pytest.mark.asyncio
+async def test_asset_rating_and_tags_rate_limit_wiring_default(monkeypatch):
+    from mjr_am_backend.features.assets.models import AssetRouteContext
+
+    captured = {}
+
+    async def _capture_prepare(_request, **kwargs):
+        captured.update(kwargs)
+        return Result.Ok(AssetRouteContext(services={}, body={}))
+
+    monkeypatch.setattr(m, "prepare_asset_route_context", _capture_prepare)
+
+    req = make_mocked_request("POST", "/mjr/am/asset/rating")
+    res = await m._prepare_asset_op_request(req, operation="asset_rating")
+    assert res.ok
+    assert captured["max_requests"] == 30
+    assert captured["window_seconds"] == 60

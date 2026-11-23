@@ -113,7 +113,7 @@ def _require_operation_enabled(
             return Result.Ok(True, operation=op, safe_mode=safe_mode)
         return Result.Err("FORBIDDEN", message, operation=op, safe_mode=safe_mode)
 
-    if op in ("write", "rating", "tags", "asset_rating", "asset_tags"):
+    if op in ("write", "rating", "tags", "asset_rating", "assets_rating", "asset_tags", "assets_tags"):
         if _write_allowed_in_context(safe_mode=safe_mode, pref_truthy=_pt):
             return Result.Ok(True, operation=op, safe_mode=safe_mode)
         return Result.Err(
@@ -142,7 +142,7 @@ def _operation_static_gates() -> tuple[tuple[tuple[str, ...], str, str, str], ..
             "Reset index is disabled by default. Enable 'allow_reset_index' in settings or set MAJOOR_ALLOW_RESET_INDEX=1.",
         ),
         (
-            ("delete", "asset_delete", "assets_delete"),
+            ("delete", "asset_delete", "assets_delete", "trash_empty"),
             "allow_delete",
             "MAJOOR_ALLOW_DELETE",
             "Delete is disabled by default. Set MAJOOR_ALLOW_DELETE=1 to enable asset deletion.",

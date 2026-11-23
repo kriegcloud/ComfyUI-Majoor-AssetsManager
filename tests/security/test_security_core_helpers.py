@@ -1,3 +1,4 @@
+# mypy: disable-error-code="arg-type"
 import sys
 import types
 
@@ -109,6 +110,50 @@ def test_require_operation_enabled_string_bool_prefs() -> None:
 
     allowed = sec._require_operation_enabled("delete", prefs={"allow_delete": "true"})
     assert allowed.ok
+
+
+def test_require_operation_enabled_assets_tags_behaves_like_asset_tags(monkeypatch) -> None:
+    monkeypatch.delenv("MAJOOR_SAFE_MODE", raising=False)
+    monkeypatch.delenv("MAJOOR_ALLOW_WRITE", raising=False)
+
+    for prefs in (
+        {"safe_mode": True, "allow_write": True},
+        {"safe_mode": True, "allow_write": False},
+        {"safe_mode": False},
+        {},
+    ):
+        bulk = sec._require_operation_enabled("assets_tags", prefs=prefs)
+        single = sec._require_operation_enabled("asset_tags", prefs=prefs)
+        assert bulk.ok == single.ok, prefs
+        assert bulk.code == single.code, prefs
+
+
+def test_require_operation_enabled_assets_rating_gated_like_asset_rating(monkeypatch) -> None:
+    monkeypatch.delenv("MAJOOR_SAFE_MODE", raising=False)
+    monkeypatch.delenv("MAJOOR_ALLOW_WRITE", raising=False)
+
+    # Safe mode with writes allowed: the batch gate must pass like the single gate.
+    allowed_batch = sec._require_operation_enabled(
+        "assets_rating", prefs={"safe_mode": True, "allow_write": True}
+    )
+    allowed_single = sec._require_operation_enabled(
+        "asset_rating", prefs={"safe_mode": True, "allow_write": True}
+    )
+    assert allowed_batch.ok is True
+    assert allowed_single.ok is True
+
+    # Safe mode without allow_write: same FORBIDDEN write-mode refusal, not
+    # the "unknown operation" fallthrough.
+    denied_batch = sec._require_operation_enabled(
+        "assets_rating", prefs={"safe_mode": True, "allow_write": False}
+    )
+    denied_single = sec._require_operation_enabled(
+        "asset_rating", prefs={"safe_mode": True, "allow_write": False}
+    )
+    assert not denied_batch.ok
+    assert denied_batch.code == "FORBIDDEN"
+    assert denied_batch.error == denied_single.error
+    assert "unknown operation" not in (denied_batch.error or "")
 
 
 def test_auth_helpers_and_authenticated_user() -> None:
@@ -320,3 +365,26 @@ def monkeypatch():
     _mp = pytest.MonkeyPatch()
     yield _mp
     _mp.undo()
+
+
+def test_require_operation_enabled_trash_empty_shares_delete_gate(monkeypatch) -> None:
+    """trash_empty must ride the delete gate, not fall through to unknown-op."""
+    monkeypatch.delenv("MAJOOR_ALLOW_DELETE", raising=False)
+    monkeypatch.delenv("MAJOOR_SAFE_MODE", raising=False)
+
+    refused = sec._require_operation_enabled(
+        "trash_empty", prefs={"safe_mode": False, "allow_delete": False}
+    )
+    assert not refused.ok
+    assert refused.code == "FORBIDDEN"
+
+    # Recognised operation: allow_delete prefs permit it even in safe mode.
+    allowed = sec._require_operation_enabled(
+        "trash_empty", prefs={"safe_mode": True, "allow_delete": "true"}
+    )
+    assert allowed.ok
+
+    # Env fallback mirrors MAJOOR_ALLOW_DELETE like asset deletion.
+    monkeypatch.setenv("MAJOOR_ALLOW_DELETE", "1")
+    via_env = sec._require_operation_enabled("trash_empty", prefs={"safe_mode": True})
+    assert via_env.ok

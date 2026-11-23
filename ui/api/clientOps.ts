@@ -345,6 +345,14 @@ export async function restoreDbBackup({ name = "", useLatest = false }: Record<s
     return post(ENDPOINTS.DB_BACKUP_RESTORE, body);
 }
 
+export async function getTrashStatus() {
+    return get(ENDPOINTS.TRASH);
+}
+
+export async function emptyTrash() {
+    return post(ENDPOINTS.TRASH_EMPTY, {});
+}
+
 export async function startDuplicatesAnalysis(limit = 250) {
     return post("/mjr/am/duplicates/analyze", {
         limit: Math.max(10, Math.min(5000, Number(limit) || 250)),
@@ -395,7 +403,15 @@ export async function deleteAssets(assetIds: any) {
         ? assetIds.map((x) => normalizeAssetId(x)).filter(Boolean)
         : [];
     const res = await post("/mjr/am/assets/delete", { ids });
-    if (res?.ok) _emitAssetsDeleted(ids);
+    if (res?.ok) {
+        const data = res?.data || {};
+        const failedIds = Array.isArray(data?.failed_ids) ? data.failed_ids : [];
+        if (Array.isArray(data?.deleted_ids)) {
+            _emitAssetsDeleted(data.deleted_ids);
+        } else if (!failedIds.length) {
+            _emitAssetsDeleted(ids);
+        }
+    }
     return res;
 }
 

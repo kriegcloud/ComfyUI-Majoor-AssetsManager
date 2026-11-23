@@ -255,6 +255,32 @@ export async function updateAssetRating(assetId: any, rating: any, options: Reco
 }
 
 /**
+ * Update ratings for multiple assets in one batch (0-5 stars)
+ */
+export async function updateAssetsRatingBulk(
+    assetIds: any,
+    rating: any,
+    options: Record<string, any> = {},
+) {
+    const enabled = _readRatingTagsSyncEnabled();
+    const ids = (Array.isArray(assetIds) ? assetIds : [assetIds])
+        .map((id: any) => normalizeAssetId(id))
+        .filter(Boolean);
+    return fetchAPI(ENDPOINTS.ASSETS_RATING, {
+        ...options,
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            ...(enabled ? { "X-MJR-RTSYNC": "on" } : {}),
+        },
+        body: JSON.stringify({
+            ids,
+            rating: Math.max(0, Math.min(5, Number(rating) || 0)),
+        }),
+    });
+}
+
+/**
  * Update asset tags
  */
 export async function updateAssetTags(assetId: any, tags: any, options: Record<string, any> = {}) {
@@ -278,6 +304,52 @@ export async function updateAssetTags(assetId: any, tags: any, options: Record<s
     }
     const endpoint = isWorkflowAsset && workflowFilepath ? ENDPOINTS.WORKFLOWS_TAGS : "/mjr/am/asset/tags";
     const result = await fetchAPI(endpoint, {
+        ...options,
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            ...(enabled ? { "X-MJR-RTSYNC": "on" } : {}),
+        },
+        body: JSON.stringify(payload),
+    });
+    if (result?.ok) {
+        invalidateTagsCache();
+    }
+    return result;
+}
+
+/**
+ * Bulk add/remove tags across many assets (server merges per asset).
+ */
+export async function updateAssetsTagsBulk(
+    assetIds: any,
+    { add = [], remove = [] }: { add?: string[]; remove?: string[] } = {},
+    options: Record<string, any> = {},
+) {
+    const ids: number[] = [];
+    const seen = new Set<number>();
+    for (const raw of Array.isArray(assetIds) ? assetIds : []) {
+        const n = Number(raw);
+        if (!Number.isFinite(n) || Math.trunc(n) <= 0) continue;
+        const key = Math.trunc(n);
+        if (seen.has(key)) continue;
+        seen.add(key);
+        ids.push(key);
+    }
+    const cleanList = (values: any) =>
+        Array.isArray(values)
+            ? values.filter((tag) => typeof tag === "string" && tag.trim()).map((tag) => tag.trim())
+            : [];
+    const payload = {
+        ids,
+        add: cleanList(add),
+        remove: cleanList(remove),
+    };
+    if (!payload.ids.length || (!payload.add.length && !payload.remove.length)) {
+        return { ok: false, data: null, error: "Nothing to update", code: "INVALID_INPUT" };
+    }
+    const enabled = _readRatingTagsSyncEnabled();
+    const result = await fetchAPI(ENDPOINTS.ASSETS_TAGS, {
         ...options,
         method: "POST",
         headers: {

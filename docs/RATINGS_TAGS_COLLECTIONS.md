@@ -1,6 +1,6 @@
 # Majoor Assets Manager - Ratings, Tags & Collections Guide
 
-**Version**: 2.4.9
+**Version**: 2.5.4
 **Last Updated**: April 5, 2026
 
 ## Overview
@@ -42,7 +42,13 @@ The rating system allows you to assign star ratings from 0 to 5 stars to your as
 #### Bulk Rating
 - Select multiple assets using Ctrl/Cmd+click or Shift+click
 - Apply the same rating to all selected assets
-- Right-click and choose "Rate" to apply to all selections
+- Press 0-5 to rate the whole selection in one batch, or right-click and choose
+  "Set rating (N selected)" — both use the batch endpoint
+  (`POST /mjr/am/assets/rating`) in chunks of at most 500 ids per request, so
+  large selections no longer trip the per-asset rate limit
+- Assets that fail (for example already deleted) are reported in a
+  "N rated, M failed" summary; everything else still gets the rating
+- With only one card selected, the previous single-asset path applies
 
 #### Rating Filters
 - Filter assets by minimum rating threshold
@@ -107,10 +113,16 @@ Tags are stored in normalized database tables:
 4. Add or remove tags as needed
 
 #### Bulk Tagging
-1. Select multiple assets
-2. Right-click and choose "Edit Tags"
-3. Add tags that apply to all selected assets
-4. Tags are applied to all selected items
+1. Select multiple assets (Ctrl/Cmd+click or Shift+click)
+2. Right-click and choose "Edit Tags (N selected)"
+3. The bulk tag editor shows every tag in the selection with its coverage, e.g. `portrait (12/30)` — the tag is on 12 of the 30 selected assets
+4. Type a tag and press Enter to add it to all selected assets
+5. Click a partial tag (coverage below N) to add it to the remaining assets
+6. Click the ✕ on a tag to remove it from all selected assets
+7. Workflow JSON assets are skipped automatically (they use the workflow tags endpoint) and reported in the result toast
+8. Large selections are sent in chunks of 500 assets per request, with a progress toast
+
+Bulk changes are applied server-side per asset (existing tags are kept, only the added/removed tags change), so tags that some assets already have are simply left untouched.
 
 ### Managing Tags
 

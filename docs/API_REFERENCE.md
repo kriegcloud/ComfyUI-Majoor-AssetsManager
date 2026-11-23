@@ -1,7 +1,7 @@
 # Majoor API Reference
 
 **Base Path**: `/mjr/am`
-**Version**: 2.4.9
+**Version**: 2.5.4
 **Last Updated**: April 7, 2026
 
 ---
@@ -12,6 +12,7 @@
 - **Current API**: `/mjr/am/*` (unversioned, stable)
 - **Version Alias**: `/mjr/am/v1/*` → redirects to `/mjr/am/*` (308 Permanent Redirect)
 - **Legacy Alias**: `/majoor/version` → redirects to `/mjr/am/version`
+- **OpenAPI compat (read-only)**: `/mjr/am/compat/assets/*` mirrors the shape of ComfyUI core `/api/assets/*` (`GET /mjr/am/compat/assets`, `/{id}`, `/{id}/content`, `/{id}/tags`, `/tags/refine`, `/seed/status`, `HEAD /hash/{hash}`). The former `/api/v2/assets/*` paths are deprecated and only served when `MJR_AM_LEGACY_API_V2_ASSETS=1`.
 
 ### Authentication
 Most endpoints require authentication when ComfyUI auth is enabled:
@@ -510,6 +511,56 @@ POST /mjr/am/asset/rating
 
 ---
 
+### Batch Update Ratings
+```http
+POST /mjr/am/assets/rating
+```
+
+Rates many assets in one request. Each asset is updated with the same per-asset
+write path (per-asset lock + Comfy-core write-through); there is no single
+transaction across assets, so missing or failing ids are reported per id.
+
+Rate limit: 10 requests / 60 s. `ids` is capped at 500 per request
+(`INVALID_INPUT` above that). `rating` is clamped to 0-5. Send
+`X-MJR-RTSYNC: on` to enqueue rating/tags file sync for the updated assets.
+
+**Request Body**:
+```json
+{
+  "ids": [1, 2, 3],
+  "rating": 4
+}
+```
+
+**Response**:
+```json
+{
+  "ok": true,
+  "data": {
+    "updated_ids": [1, 2, 3],
+    "failed": [],
+    "rating": 4
+  }
+}
+```
+
+Missing ids are reported in `failed` while the rest are still processed
+(`meta.partial` is `true`):
+
+```json
+{
+  "ok": true,
+  "data": {
+    "updated_ids": [1],
+    "failed": [{ "id": 999, "code": "NOT_FOUND", "error": "Asset not found: 999" }],
+    "rating": 2
+  },
+  "meta": { "partial": true, "attempted": 2, "updated": 1, "failed": 1 }
+}
+```
+
+---
+
 ### Update Tags
 ```http
 POST /mjr/am/asset/tags
@@ -534,6 +585,46 @@ POST /mjr/am/asset/tags
   }
 }
 ```
+
+---
+
+### Bulk Update Tags (add/remove across assets)
+```http
+POST /mjr/am/assets/tags
+```
+
+Merges tags per asset on the server: `(existing ∪ add) − remove` (case-insensitive; existing tags keep their casing, added tags keep the request's casing). Each asset is updated independently under its own lock — assets that fail (missing id, or the merged set would exceed 50 tags) are reported in `failed` while the rest still succeed (`meta.partial` is `true` in that case).
+
+**Request Body**:
+```json
+{
+  "ids": [1, 2, 3, 4],
+  "add": ["fantasy"],
+  "remove": ["draft"]
+}
+```
+
+- `ids`: 1-500 asset IDs per request
+- `add` / `remove`: tag lists (same sanitising as the single-asset route); at least one non-empty tag after sanitising
+
+**Response**:
+```json
+{
+  "ok": true,
+  "data": {
+    "updated_ids": [1, 2],
+    "unchanged_ids": [3],
+    "failed": [{"id": 4, "code": "NOT_FOUND", "error": "Asset not found: 4"}],
+    "tags": {"1": ["fantasy"], "2": ["fantasy", "character"], "3": ["fantasy"]}
+  },
+  "meta": {"updated": 2, "unchanged": 1, "failed": 1, "partial": true}
+}
+```
+
+**Notes**:
+- Rate limited to 10 requests / 60 s (like bulk delete).
+- Honours `X-MJR-RTSYNC` like the single-asset route (file metadata sync enqueued for updated assets only).
+- One audit log entry per request (`assets_tags`, target truncated to the first 25 ids).
 
 ---
 
@@ -602,7 +693,7 @@ POST /mjr/am/assets/delete
 **Request Body**:
 ```json
 {
-  "asset_ids": ["asset_123", "asset_124", "asset_125"]
+  "ids": ["asset_123", "asset_124", "asset_125"]
 }
 ```
 
@@ -611,10 +702,23 @@ POST /mjr/am/assets/delete
 {
   "ok": true,
   "data": {
-    "deleted_count": 3,
-    "deleted_ids": ["asset_123", "asset_124", "asset_125"],
-    "failed": []
+    "deleted": 2,
+    "deleted_ids": ["asset_123", "asset_124"],
+    "failed_ids": ["asset_125"]
   }
+}
+```
+
+**Error Meta**: validation is all-or-nothing (nothing is deleted on rejection). Rejections carry the offending ids in `meta`:
+- `meta.missing_ids` — ids not found (`NOT_FOUND`).
+- `meta.rejected_ids` — ids rejected by path validation (`FORBIDDEN` / `INVALID_INPUT`).
+
+```json
+{
+  "ok": false,
+  "error": "Assets not found: [asset_125]",
+  "code": "NOT_FOUND",
+  "meta": { "missing_ids": ["asset_125"] }
 }
 ```
 
@@ -1159,6 +1263,51 @@ POST /mjr/am/db/force-delete
 ```
 
 **Note**: This endpoint bypasses normal DB-dependent security checks for emergency recovery.
+
+---
+
+### Trash Status
+```http
+GET /mjr/am/trash
+```
+
+**Purpose**: Report how many freedesktop trash entries came from Majoor's folders (output, input, custom roots). Linux/BSD only; the response never contains file paths. Rate-limited to 20 requests per 60 seconds.
+
+**Response**:
+```json
+{
+  "ok": true,
+  "data": {
+    "supported": true,
+    "count": 3,
+    "bytes": 1048576
+  }
+}
+```
+
+---
+
+### Empty Trash
+```http
+POST /mjr/am/trash/empty
+```
+
+**Purpose**: Permanently remove the freedesktop trash entries whose original location was inside a Majoor folder. Entries from outside Majoor's folders, orphans, and symlink-reachable payloads are never touched; a trash directory is only used when it belongs to the current user and is not group/world-writable. Directories inside the trash are never removed (reported in `skipped_dirs`). Requires the same permission as asset deletion (`allow_delete` / `MAJOOR_ALLOW_DELETE=1`); rate-limited to 3 requests per 60 seconds.
+
+**Response**:
+```json
+{
+  "ok": true,
+  "data": {
+    "removed": 3,
+    "bytes": 1048576,
+    "failed": [],
+    "skipped_dirs": 0
+  }
+}
+```
+
+`failed` lists entries that could not be removed (`name` + `error`); the remaining entries are still removed. `skipped_dirs` counts directory payloads, which are left in place.
 
 ---
 

@@ -38,8 +38,10 @@ import { reportError } from "../../utils/logging.js";
 import { safeClosest, safeEscapeSelector } from "../../utils/dom.js";
 import { safeDispatchCustomEvent } from "../../utils/events.js";
 import { confirmDeletion } from "../../utils/deleteGuard.js";
+import { deleteAssetsInChunks } from "../grid/bulkDelete.js";
 import { showAddToCollectionMenu } from "../collections/contextmenu/addToCollectionMenu.js";
 import { removeAssetsFromGrid } from "../grid/gridApi.js";
+import { rateAssetsInBulk } from "../grid/bulkRating.js";
 import {
     getRawHostApp,
     importWorkflowPreferHostTab,
@@ -881,10 +883,26 @@ function _ensureRightClickSelection({ asset, card, gridContainer }: { asset?: an
     return selectedIds;
 }
 
-function _buildRatingSubmenu(asset: any, canRate: any) {
+function _buildRatingSubmenu(asset: any, canRate: any, bulkIds: string[] | null = null) {
     const stars = (n: any) => "*".repeat(n) + "o".repeat(Math.max(0, 5 - n));
     const updateRenderedRating = (value: any) => {
         syncRenderedCardAsset(asset, { rating: value });
+    };
+    const isBulk = Array.isArray(bulkIds) && bulkIds.length >= 2;
+    const applyValue = async (value: any) => {
+        if (isBulk) {
+            // No optimistic render here: card badges update from the
+            // mjr:asset-rating-changed events dispatched for confirmed ids.
+            try {
+                await rateAssetsInBulk(bulkIds, value);
+            } catch (error: any) {
+                reportError(error, "[GridContextMenu] Bulk rating", {
+                    showToast: APP_CONFIG.DEBUG_VERBOSE_ERRORS,
+                });
+            }
+            return;
+        }
+        setRating(asset, value, () => updateRenderedRating(value));
     };
 
     return [
@@ -893,7 +911,7 @@ function _buildRatingSubmenu(asset: any, canRate: any) {
             "pi pi-star",
             null,
             async () => {
-                setRating(asset, 5, () => updateRenderedRating(5));
+                await applyValue(5);
             },
             { disabled: !canRate },
         ),
@@ -902,7 +920,7 @@ function _buildRatingSubmenu(asset: any, canRate: any) {
             "pi pi-star",
             null,
             async () => {
-                setRating(asset, 4, () => updateRenderedRating(4));
+                await applyValue(4);
             },
             { disabled: !canRate },
         ),
@@ -911,7 +929,7 @@ function _buildRatingSubmenu(asset: any, canRate: any) {
             "pi pi-star",
             null,
             async () => {
-                setRating(asset, 3, () => updateRenderedRating(3));
+                await applyValue(3);
             },
             { disabled: !canRate },
         ),
@@ -920,7 +938,7 @@ function _buildRatingSubmenu(asset: any, canRate: any) {
             "pi pi-star",
             null,
             async () => {
-                setRating(asset, 2, () => updateRenderedRating(2));
+                await applyValue(2);
             },
             { disabled: !canRate },
         ),
@@ -929,7 +947,7 @@ function _buildRatingSubmenu(asset: any, canRate: any) {
             "pi pi-star",
             null,
             async () => {
-                setRating(asset, 1, () => updateRenderedRating(1));
+                await applyValue(1);
             },
             { disabled: !canRate },
         ),
@@ -939,7 +957,7 @@ function _buildRatingSubmenu(asset: any, canRate: any) {
             "pi pi-star",
             "0",
             async () => {
-                setRating(asset, 0, () => updateRenderedRating(0));
+                await applyValue(0);
             },
             { disabled: !canRate },
         ),
@@ -1163,7 +1181,13 @@ function _buildAssetItems({
     pointerY,
     selection,
 }: { asset?: any; card?: any; gridContainer?: any; panelState?: any; pointerX?: any; pointerY?: any; selection?: any } = {}) {
-    const { selectedAssetsNow, effectiveSelectionCount, isMultiSelected, hasSelection } = selection;
+    const {
+        selectedIds,
+        selectedAssetsNow,
+        effectiveSelectionCount,
+        isMultiSelected,
+        hasSelection,
+    } = selection;
     const items: any[] = [];
     const inWorkflowScope = _isWorkflowScope(panelState);
     const openInViewer = ({ assets = [] as any[], index = 0, mode = "" } = {}) =>
@@ -1524,13 +1548,43 @@ function _buildAssetItems({
     }
 
     const canRate = !!(asset?.id || getAssetFilepath(asset));
+    const rightClickAssetId = String(asset?.id ?? "");
+    const bulkTagsSelection =
+        rightClickAssetId &&
+        selectedCount >= 2 &&
+        mediaSelectedAssets.some(
+            (entry: any) => entry && String(entry?.id ?? "") === rightClickAssetId,
+        )
+            ? mediaSelectedAssets
+            : null;
+    // Bulk only when the right-clicked card itself is part of a multi-selection;
+    // right-clicking an unselected card keeps the single-card path for that card.
+    const clickedAssetId = asset?.id != null ? String(asset.id) : "";
+    const ratingBulkIds =
+        isMultiSelected &&
+        selectedIds.size >= 2 &&
+        !!clickedAssetId &&
+        selectedIds.has(clickedAssetId)
+            ? Array.from(selectedIds, String)
+            : null;
+    const ratingLabel = ratingBulkIds
+        ? t("ctx.setRatingN", "Set rating ({n} selected)", { n: ratingBulkIds.length })
+        : t("ctx.setRating", "Set rating");
     items.push(
         createSeparator(),
         createItem(
-            t("ctx.editTags", "Edit tags"),
+            bulkTagsSelection
+                ? t("ctx.editTagsSelected", "Edit tags ({count} selected)", {
+                      count: bulkTagsSelection.length,
+                  })
+                : t("ctx.editTags", "Edit tags"),
             "pi pi-tags",
             getShortcutDisplay("EDIT_TAGS"),
             () => {
+                if (bulkTagsSelection) {
+                    showBulkTagsPopover(pointerX + 6, pointerY + 6, bulkTagsSelection);
+                    return;
+                }
                 showTagsPopover(pointerX + 6, pointerY + 6, asset, () => {
                     syncRenderedCardAsset(asset, {
                         tags: Array.isArray(asset?.tags) ? [...asset.tags] : [],
@@ -1540,10 +1594,10 @@ function _buildAssetItems({
             { closeOnSelect: false },
         ),
         createSeparator(),
-        createItem(t("ctx.setRating", "Set rating"), "pi pi-star", "1-5 >", null, {
+        createItem(ratingLabel, "pi pi-star", "1-5 >", null, {
             disabled: !canRate,
             closeOnSelect: false,
-            submenu: _buildRatingSubmenu(asset, canRate),
+            submenu: _buildRatingSubmenu(asset, canRate, ratingBulkIds),
         }),
         createSeparator(),
         createItem(
@@ -1669,27 +1723,28 @@ function _buildAssetItems({
                     if (!ok) return;
 
                     try {
-                        let successCount = 0;
-                        let errorCount = 0;
-                        const deletedIds = [];
-                        let deletedByFilepath = 0;
                         const selectionList = selectedAssetsNow.length
                             ? selectedAssetsNow
                             : [asset];
 
-                        for (const selectedAsset of selectionList) {
-                            const result = await deleteAsset(selectedAsset);
-                            if (result?.ok) {
-                                successCount += 1;
-                                if (selectedAsset?.id != null) {
-                                    deletedIds.push(String(selectedAsset.id));
-                                } else {
-                                    deletedByFilepath += 1;
-                                }
-                            } else {
-                                errorCount += 1;
-                            }
-                        }
+                        const { deletedIds, failedCount, deletedByFilepath } =
+                            await deleteAssetsInChunks(selectionList, {
+                                onProgress: ({ done, total }) => {
+                                    if (done < total) {
+                                        comfyToast(
+                                            t(
+                                                "toast.filesDeletingProgress",
+                                                "Deleting files... ({done}/{total})",
+                                                { done, total },
+                                            ),
+                                            "info",
+                                            1600,
+                                        );
+                                    }
+                                },
+                            });
+                        const successCount = deletedIds.length + deletedByFilepath;
+                        const errorCount = failedCount;
 
                         if (deletedIds.length) {
                             const removal = removeAssetsFromGrid(gridContainer, deletedIds);
@@ -1780,6 +1835,16 @@ export function showTagsPopover(x: number, y: number, asset: Record<string, any>
         y,
         asset,
         onChanged,
+    });
+}
+
+export function showBulkTagsPopover(x: number, y: number, assets: Record<string, any>[]): void {
+    const selection = Array.isArray(assets) ? assets.filter(Boolean) : [];
+    if (selection.length < 2) return;
+    openGridTagsPopover({
+        x,
+        y,
+        assets: selection,
     });
 }
 
