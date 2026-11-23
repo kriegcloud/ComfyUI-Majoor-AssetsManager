@@ -1,11 +1,11 @@
 import { $ as e, $n as t, At as n, B as r, Bn as i, Bt as a, C as o, Ct as s, D as c, E as l, En as u, F as d, Fn as f, Ft as p, Gn as m, Gt as h, Ht as g, I as _, In as v, It as y, Jn as b, Jt as x, Kn as S, Kt as C, L as w, M as T, Mt as E, N as D, Nt as O, On as k, P as A, Qn as j, Qt as M, Rn as N, S as P, Sn as ee, Vn as te, Vt as F, Wn as ne, Xn as I, Xt as re, Yn as ie, Yt as ae, Zn as oe, Zt as se, _ as ce, a as le, an as L, ar as ue, at as de, b as fe, cn as pe, ct as me, dr as he, dt as ge, er as _e, f as ve, fr as ye, ft as be, g as xe, i as Se, ir as Ce, it as we, j as Te, jt as Ee, k as De, kt as Oe, l as ke, lr as Ae, lt as je, m as Me, n as Ne, nr as Pe, nt as Fe, o as Ie, or as Le, ot as Re, p as ze, pr as Be, pt as Ve, qn as He, qt as Ue, rr as We, s as Ge, sn as Ke, sr as qe, st as Je, tr as Ye, u as Xe, ur as Ze, ut as Qe, v as R, vt as $e, w as et, x as tt, xn as nt, y as rt, z as it, zn as at, zt as ot } from "./chunks/client-CpKyshuF.js";
 import { a as st, i as ct, n as lt, t as ut } from "./chunks/graphTraversal-DTdQWkn5.js";
 import { t as z } from "./chunks/config-BFDzOF1N.js";
-import { _ as dt, c as ft, d as pt, f as mt, g as ht, h as gt, l as _t, m as vt, o as yt, p as bt, s as xt, u as St } from "./chunks/floatingViewerManager-CKQVW5Bp.js";
-import { A as Ct, D as wt, E as Tt, F as Et, M as Dt, N as Ot, O as kt, P as At, S as jt, T as Mt, b as Nt, j as Pt, k as Ft, w as It, x as Lt } from "./chunks/minimap-xkykW8ul.js";
+import { _ as dt, c as ft, d as pt, f as mt, g as ht, h as gt, l as _t, m as vt, o as yt, p as bt, s as xt, u as St } from "./chunks/floatingViewerManager-D-sa_F9I.js";
+import { A as Ct, D as wt, E as Tt, F as Et, M as Dt, N as Ot, O as kt, P as At, S as jt, T as Mt, b as Nt, j as Pt, k as Ft, w as It, x as Lt } from "./chunks/minimap-CcYrkLC7.js";
 import { n as Rt, r as B, t as zt } from "./chunks/events-1iwo5blr.js";
-import { _ as Bt, c as Vt, f as Ht, i as Ut, l as Wt, n as Gt, o as Kt, p as qt, r as Jt, s as Yt, t as Xt, u as Zt } from "./chunks/tooltipShortcuts-BwbnLcjm.js";
-import { A as Qt, B as $t, C as en, D as tn, E as nn, F as rn, G as an, H as on, I as sn, J as cn, K as ln, L as un, M as dn, N as fn, O as pn, P as mn, R as hn, S as gn, T as _n, U as vn, V as yn, W as bn, X as xn, Y as Sn, _ as Cn, a as wn, b as Tn, c as En, d as Dn, f as On, g as kn, h as An, i as jn, j as Mn, k as Nn, l as Pn, m as Fn, n as In, o as Ln, p as Rn, q as zn, r as Bn, s as Vn, t as Hn, u as Un, v as Wn, w as Gn, x as Kn, y as qn, z as Jn } from "./chunks/TagsEditor-imck3-V3.js";
+import { _ as Bt, c as Vt, f as Ht, i as Ut, l as Wt, n as Gt, o as Kt, p as qt, r as Jt, s as Yt, t as Xt, u as Zt } from "./chunks/tooltipShortcuts-DEXU-G6E.js";
+import { A as Qt, B as $t, C as en, D as tn, E as nn, F as rn, G as an, H as on, I as sn, J as cn, K as ln, L as un, M as dn, N as fn, O as pn, P as mn, R as hn, S as gn, T as _n, U as vn, V as yn, W as bn, X as xn, Y as Sn, _ as Cn, a as wn, b as Tn, c as En, d as Dn, f as On, g as kn, h as An, i as jn, j as Mn, k as Nn, l as Pn, m as Fn, n as In, o as Ln, p as Rn, q as zn, r as Bn, s as Vn, t as Hn, u as Un, v as Wn, w as Gn, x as Kn, y as qn, z as Jn } from "./chunks/TagsEditor-YZq1n__A.js";
 import { $ as Yn, B as Xn, C as V, D as Zn, E as H, F as Qn, G as $n, H as er, J as tr, K as nr, M as U, N as rr, O as W, P as ir, Q as G, R as ar, S as or, T as K, U as sr, V as cr, W as q, X as lr, Z as ur, at as dr, b as fr, ct as pr, ft as mr, gt as J, ht as hr, j as gr, k as Y, lt as _r, mt as X, ot as vr, pt as Z, q as yr, st as Q, ut as br, v as xr, w as Sr, x as Cr, y as wr } from "./chunks/mjr-primevue-C07IsEdU.js";
 import { n as Tr, r as Er } from "./chunks/mjr-vue-vendor-CEDOnn2t.js";
 import { app as Dr } from "../../scripts/app.js";
@@ -1989,7 +1989,7 @@ function Ea() {
 	return wa ||= import("./chunks/viewerOpenRequest-WOJE90Gn.js").then((e) => e.n), wa;
 }
 function Da() {
-	return Ta ||= import("./chunks/floatingViewerManager-CKQVW5Bp.js").then((e) => e.n), Ta;
+	return Ta ||= import("./chunks/floatingViewerManager-D-sa_F9I.js").then((e) => e.n), Ta;
 }
 function Oa(e) {
 	let t = String(e || "").trim().toLowerCase();
@@ -8233,7 +8233,7 @@ var Ed = {
 			return g ||= import("./chunks/viewerOpenRequest-WOJE90Gn.js").then((e) => e.n), g;
 		}
 		function y() {
-			return _ ||= import("./chunks/floatingViewerManager-CKQVW5Bp.js").then((e) => e.n), _;
+			return _ ||= import("./chunks/floatingViewerManager-D-sa_F9I.js").then((e) => e.n), _;
 		}
 		function b(e) {
 			return (Array.isArray(e) ? e : []).slice().sort((e, t) => {
@@ -9500,7 +9500,7 @@ function Kd() {
 	return Wd ||= import("./chunks/viewerOpenRequest-WOJE90Gn.js").then((e) => e.n), Wd;
 }
 function qd() {
-	return Gd ||= import("./chunks/floatingViewerManager-CKQVW5Bp.js").then((e) => e.n), Gd;
+	return Gd ||= import("./chunks/floatingViewerManager-D-sa_F9I.js").then((e) => e.n), Gd;
 }
 function Jd(e) {
 	let t = document.createElement("button");
@@ -11757,7 +11757,7 @@ function wm() {
 var Tm = /* @__PURE__ */ ir({
 	__name: "GlobalRuntime",
 	setup(e) {
-		let t = rr(() => import("./chunks/ViewerPortal-S0oyeVB6.js")), n = Q(!1), r = [
+		let t = rr(() => import("./chunks/ViewerPortal-BJaaS5l6.js")), n = Q(!1), r = [
 			B.OPEN_VIEWER,
 			B.MFV_OPEN,
 			B.MFV_TOGGLE,
@@ -24888,7 +24888,7 @@ async function Sw(e) {
 	try {
 		let t = await yw(e);
 		if (t.length) {
-			let { floatingViewerManager: e } = await import("./chunks/floatingViewerManager-CKQVW5Bp.js").then((e) => e.n);
+			let { floatingViewerManager: e } = await import("./chunks/floatingViewerManager-D-sa_F9I.js").then((e) => e.n);
 			if (await e.openAssets({
 				assets: t,
 				index: 0
@@ -25358,7 +25358,7 @@ function Yw({ cleanupEntryRuntimeFn: e = qw, teardownLiveStreamTracker: t, teard
 // ui/entry.ts
 var Xw = null, Zw = null, Qw = null;
 function $w() {
-	return Qw ||= import("./chunks/floatingViewerManager-CKQVW5Bp.js").then((e) => e.n), Qw;
+	return Qw ||= import("./chunks/floatingViewerManager-D-sa_F9I.js").then((e) => e.n), Qw;
 }
 function eT() {
 	Qw && Qw.then((e) => e?.teardownFloatingViewerManager?.()).catch((e) => console.debug?.("[Majoor] MFV teardown skipped", e));
@@ -25478,7 +25478,7 @@ function yT(e = 1200) {
 	}, Math.max(250, Number(e) || 0));
 }
 function bT(e) {
-	import("./chunks/LiveStreamTracker-CB7rhXhO.js").then((t) => {
+	import("./chunks/LiveStreamTracker-F4HBykfU.js").then((t) => {
 		Xw = t;
 		try {
 			t.initLiveStreamTracker(e);

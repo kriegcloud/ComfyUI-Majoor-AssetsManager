@@ -63,6 +63,22 @@ describe("open media workflow", () => {
         expect(mocks.load).toHaveBeenCalledWith(workflow, "a.png", "workflow");
     });
 
+    it("does not treat browser-mode synthetic ids as database ids", async () => {
+        mocks.get.mockResolvedValue({ ok: true, data: { workflow } });
+        const filepath = "/media/refs/T2I/t2i_00005_ (1)-2.png";
+        await openAssetWorkflow({
+            id: `asset:custom|image|${filepath}|T2I|t2i_00005_ (1)-2.png`,
+            filename: "t2i_00005_ (1)-2.png",
+            subfolder: "T2I",
+            type: "custom",
+            filepath,
+        });
+        expect(mocks.metadata).not.toHaveBeenCalled();
+        const query = new URL(mocks.get.mock.calls[0][0], "http://localhost").searchParams;
+        expect(query.get("filepath")).toBe(filepath);
+        expect(mocks.load).toHaveBeenCalledWith(workflow, "t2i_00005_ (1)-2.png", "workflow");
+    });
+
     it("sends filename and output type for plain output files", async () => {
         await openAssetWorkflow({ filename: "b.png", subfolder: "x" });
         const query = new URL(mocks.get.mock.calls[0][0], "http://localhost").searchParams;

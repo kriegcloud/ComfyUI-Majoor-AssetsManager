@@ -1,10 +1,10 @@
 import { Gt as e, Zn as t, an as n, d as r, l as i, o as a, or as o, w as s } from "./client-CpKyshuF.js";
-import { a as c, i as l, r as u } from "./floatingViewerManager-CKQVW5Bp.js";
-import { w as d } from "./minimap-xkykW8ul.js";
+import { a as c, i as l, r as u } from "./floatingViewerManager-D-sa_F9I.js";
+import { w as d } from "./minimap-CcYrkLC7.js";
 import { i as f, r as p, t as ee } from "./events-1iwo5blr.js";
-import { a as m, i as h, n as g, r as _, t as te } from "./TagsEditor-imck3-V3.js";
+import { a as m, i as h, n as g, r as _, t as te } from "./TagsEditor-YZq1n__A.js";
 import { $ as ne, A as v, B as re, C as y, D as b, E as x, H as S, J as ie, K as C, M as w, O as T, P as E, Q as D, S as O, T as k, U as A, V as ae, W as j, X as M, Y as N, b as oe, gt as P, ht as F, j as I, k as L, lt as se, mt as R, ot as ce, pt as z, q as B, rt as le, st as V, w as ue, z as H } from "./mjr-primevue-C07IsEdU.js";
-import { C as U, _ as W, a as de, b as fe, c as G, d as pe, f as me, g as he, h as ge, i as _e, l as ve, m as ye, n as be, o as K, p as xe, r as Se, s as q, t as Ce, u as we, v as Te, x as Ee, y as De } from "./genInfo-C7UX0OC7.js";
+import { C as U, _ as W, a as de, b as fe, c as G, d as pe, f as me, g as he, h as ge, i as _e, l as ve, m as ye, n as be, o as K, p as xe, r as Se, s as q, t as Ce, u as we, v as Te, x as Ee, y as De } from "./genInfo-Bqu_UsRl.js";
 // ui/vue/components/viewer/FloatingViewerHost.vue
 var Oe = /* @__PURE__ */ E({
 	__name: "FloatingViewerHost",

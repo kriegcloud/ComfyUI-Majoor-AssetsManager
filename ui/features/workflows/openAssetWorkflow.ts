@@ -3,7 +3,7 @@ import { ENDPOINTS } from "../../api/endpoints.js";
 import { t } from "../../app/i18n.js";
 import { openWorkflowInHostTab } from "../../app/hostAdapter.js";
 import { comfyToast } from "../../app/toast.js";
-import { pickRootId } from "../../utils/ids.js";
+import { normalizeAssetId, pickRootId } from "../../utils/ids.js";
 
 type RecordData = Record<string, any>;
 type SavedGraph = { format: "workflow" | "prompt"; data: RecordData };
@@ -58,7 +58,11 @@ export function getSavedAssetGraph(asset: RecordData | null): SavedGraph | null 
 async function readAssetGraph(asset: RecordData): Promise<SavedGraph | null> {
     let saved = getSavedAssetGraph(asset);
     // An indexed asset may have only a compact listing payload. Hydrate it first.
-    if (!saved && asset.id != null && asset.id !== "") {
+    // Browser-mode cards (pinned folders) carry a synthetic string id such as
+    // "asset:custom|image|<path>|...", not a database id; skip straight to the
+    // path lookup for those instead of requesting /mjr/am/asset/<empty>.
+    const dbId = normalizeAssetId(asset.id);
+    if (!saved && dbId) {
         const result = await getAssetMetadata(asset.id, { timeoutMs: 30_000 });
         if (!result?.ok) throw new Error("metadata");
         saved = getSavedAssetGraph(result.data);

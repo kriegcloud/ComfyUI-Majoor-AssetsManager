@@ -1,6 +1,6 @@
 import { An as e, Sn as t, Un as n, _n as r, an as i, dn as a, xn as o } from "./client-CpKyshuF.js";
 import { a as s, n as c } from "./graphTraversal-DTdQWkn5.js";
-import { T as l } from "./minimap-xkykW8ul.js";
+import { T as l } from "./minimap-CcYrkLC7.js";
 import { _ as u, a as d, c as f, d as p, f as ee, g as te, h as m, i as h, l as g, m as _, n as v, o as y, p as ne, r as re, s as ie, t as ae, u as oe } from "./mjr-primevue-C07IsEdU.js";
 import { t as se } from "./mjr-vue-vendor-CEDOnn2t.js";
 // ui/features/viewer/floatingViewerProgress.ts
