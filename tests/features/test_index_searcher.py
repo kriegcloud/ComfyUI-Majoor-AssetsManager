@@ -519,3 +519,48 @@ async def test_paginate_grouped_assets_preserves_generation_time_on_selected_sta
     assert assets[0]["filename"] == "LTX-23_00001-audio.mp4"
     assert assets[0]["generation_time_ms"] == 218600
     assert assets[0]["stack_asset_count"] == 2
+
+
+@pytest.mark.asyncio
+async def test_lookup_assets_by_filepaths_sql_has_no_unresolved_braces():
+    """Regression: the template lacked its f-prefix, so SQLite received the
+    literal text "{_normalized_tags_json_select('a')}" and every browser/custom
+    listing enrichment failed with 'unrecognized token: "{"'."""
+    import re
+
+    from mjr_am_backend.adapters.db.transaction_manager import build_in_query
+
+    class _InCapture(_DB):
+        def __init__(self):
+            super().__init__()
+            self.sql = None
+
+        async def aquery_in(self, sql, _col, _values):
+            self.sql = sql
+            return Result.Ok([])
+
+    db = _InCapture()
+    res = await _mk(db).lookup_assets_by_filepaths(["/refs/a.png"])
+    assert res.ok
+    assert db.sql.count("{IN_CLAUSE}") == 1
+
+    ok, built, _ = build_in_query(db.sql, "a.filepath", 1)
+    assert ok
+    outside_literals = re.sub(r"'(?:[^']|'')*'", "''", built)
+    assert "{" not in outside_literals and "}" not in outside_literals
+
+    # And it must actually prepare against a schema with the referenced tables.
+    conn = sqlite3.connect(":memory:")
+    conn.executescript(
+        """
+        ATTACH ':memory:' AS vec;
+        CREATE TABLE assets (id INTEGER PRIMARY KEY, filepath TEXT, source TEXT, root_id TEXT,
+            enhanced_caption TEXT);
+        CREATE TABLE asset_metadata (asset_id INTEGER, rating INTEGER, has_workflow INTEGER,
+            has_generation_data INTEGER, workflow_type TEXT, metadata_raw TEXT);
+        CREATE TABLE tags (id INTEGER PRIMARY KEY, name TEXT);
+        CREATE TABLE asset_tags (asset_id INTEGER, tag_id INTEGER);
+        CREATE TABLE vec.asset_embeddings (asset_id INTEGER, auto_tags TEXT, vector BLOB);
+        """
+    )
+    conn.execute("EXPLAIN " + built, ("/refs/a.png",))

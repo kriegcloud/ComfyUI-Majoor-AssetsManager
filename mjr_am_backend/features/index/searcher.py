@@ -2126,8 +2126,9 @@ class IndexSearcher:
         if not cleaned:
             return Result.Ok({})
 
+        # f-string: interpolate the tags subquery; {{IN_CLAUSE}} stays for aquery_in.
         result = await self.db.aquery_in(
-            """
+            f"""
             SELECT
                 a.filepath,
                 a.id,
@@ -2164,7 +2165,7 @@ class IndexSearcher:
             FROM assets a
             LEFT JOIN asset_metadata m ON a.id = m.asset_id
             LEFT JOIN vec.asset_embeddings ae ON a.id = ae.asset_id
-            WHERE {IN_CLAUSE}
+            WHERE {{IN_CLAUSE}}
             """,
             "a.filepath",
             cleaned,
